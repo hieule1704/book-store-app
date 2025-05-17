@@ -27,6 +27,12 @@ if (isset($_POST['add_to_cart'])) {
    }
 }
 
+if (isset($_POST['more_detail'])) {
+   $product_id = $_POST['product_id'];
+   header("Location: detail.php?id=$product_id");
+   exit();
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -73,17 +79,21 @@ if (isset($_POST['add_to_cart'])) {
          if (mysqli_num_rows($select_products) > 0) {
             while ($fetch_products = mysqli_fetch_assoc($select_products)) {
          ?>
-               <div class="col-md-3 col-sm-6">
-                  <form action="" method="post" class="card h-100 shadow">
-                     <img class="card-img-top" src="uploaded_img/<?php echo $fetch_products['image']; ?>" alt="">
+               <div class="col-md-4 col-sm-6">
+                  <form action="" method="post" class="card w-75 shadow">
+                     <img class="card-img-top p-3" src="uploaded_img/<?php echo $fetch_products['image']; ?>" alt="">
                      <div class="card-body d-flex flex-column">
                         <div class="mb-2 fw-bold fs-5"><?php echo $fetch_products['name']; ?></div>
-                        <div class="mb-2 text-danger fw-bold">$<?php echo $fetch_products['price']; ?>/-</div>
+                        <div class="mb-2 text-danger fs-5 fw-bold">$<?php echo number_format($fetch_products['price'], 0, ',', '.'); ?></div>
                         <input type="number" min="1" name="product_quantity" value="1" class="form-control mb-2" style="max-width:120px;">
                         <input type="hidden" name="product_name" value="<?php echo $fetch_products['name']; ?>">
                         <input type="hidden" name="product_price" value="<?php echo $fetch_products['price']; ?>">
                         <input type="hidden" name="product_image" value="<?php echo $fetch_products['image']; ?>">
-                        <button type="submit" name="add_to_cart" class="btn btn-primary mt-auto">Add to cart</button>
+                        <input type="hidden" name="product_id" value="<?php echo $fetch_products['id']; ?>">
+                        <div class="d-flex align-items-center mt-2">
+                           <button type="submit" name="add_to_cart" class="btn btn-primary">Add to cart</button>
+                           <button type="submit" name="more_detail" class="btn btn-warning ms-3">More detail</button>
+                        </div>
                      </div>
                   </form>
                </div>

@@ -14,7 +14,7 @@ if (isset($_POST['update_cart'])) {
    $cart_id = $_POST['cart_id'];
    $cart_quantity = $_POST['cart_quantity'];
    mysqli_query($conn, "UPDATE `cart` SET quantity = '$cart_quantity' WHERE id = '$cart_id'") or die('query failed');
-   $message[] = 'cart quantity updated!';
+   $message[] = 'Cart quantity updated!';
 }
 
 if (isset($_GET['delete'])) {
@@ -71,25 +71,21 @@ if (isset($_GET['delete_all'])) {
          if (mysqli_num_rows($select_cart) > 0) {
             while ($fetch_cart = mysqli_fetch_assoc($select_cart)) {
          ?>
+
                <div class="col-md-4 col-sm-6">
-                  <div class="card shadow h-100">
-                     <div class="card-header d-flex justify-content-end p-2">
-                        <a href="cart.php?delete=<?php echo $fetch_cart['id']; ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('delete this from cart?');">
-                           <i class="fas fa-times"></i>
-                        </a>
-                     </div>
-                     <img src="uploaded_img/<?php echo $fetch_cart['image']; ?>" class="card-img-top" alt="">
+                  <form action="" method="post" class="card w-75 shadow">
+                     <img class="card-img-top p-3" src="uploaded_img/<?php echo $fetch_cart['image']; ?>" alt="">
                      <div class="card-body d-flex flex-column">
-                        <div class="fw-bold fs-5 mb-2"><?php echo $fetch_cart['name']; ?></div>
-                        <div class="mb-2 text-danger fw-bold">$<?php echo $fetch_cart['price']; ?>/-</div>
-                        <form action="" method="post" class="d-flex align-items-center mb-2">
+                        <div class="mb-2 fw-bold fs-5"><?php echo $fetch_cart['name']; ?></div>
+                        <div class="mb-2 text-danger fs-5 fw-bold">$<?php echo number_format($fetch_cart['price'], 0, ',', '.'); ?></div>
+                        <div class="d-flex align-items-center mt-2">
                            <input type="hidden" name="cart_id" value="<?php echo $fetch_cart['id']; ?>">
-                           <input type="number" min="1" name="cart_quantity" value="<?php echo $fetch_cart['quantity']; ?>" class="form-control me-2" style="max-width: 80px;">
-                           <input type="submit" name="update_cart" value="Update" class="btn btn-warning btn-sm">
-                        </form>
-                        <div class="sub-total mb-2">Sub total: <span class="fw-bold">$<?php echo $sub_total = ($fetch_cart['quantity'] * $fetch_cart['price']); ?>/-</span></div>
+                           <input type="number" min="1" name="cart_quantity" value="<?php echo $fetch_cart['quantity']; ?>" class="form-control" style="max-width:120px;">
+                           <button type="submit" name="update_cart" class="btn btn-warning ms-2">Update</button>
+                        </div>
+                        <div class="sub-total my-2">Sub total: <span class="fw-bold">$<?php echo number_format($sub_total = ($fetch_cart['quantity'] * $fetch_cart['price']), 0, ',', '.'); ?></span></div>
                      </div>
-                  </div>
+                  </form>
                </div>
          <?php
                $grand_total += $sub_total;
@@ -106,7 +102,7 @@ if (isset($_GET['delete_all'])) {
 
       <div class="card mx-auto" style="max-width: 400px;">
          <div class="card-body text-center">
-            <p class="mb-3 fs-5">Grand total: <span class="fw-bold text-primary">$<?php echo $grand_total; ?>/-</span></p>
+            <p class="mb-3 fs-5">Grand total: <span class="fw-bold text-primary">$<?php echo number_format($grand_total, 0, ',', '.'); ?></span></p>
             <div class="d-flex justify-content-center gap-2">
                <a href="shop.php" class="btn btn-warning">Continue shopping</a>
                <a href="checkout.php" class="btn btn-primary <?php echo ($grand_total > 1) ? '' : 'disabled'; ?>">Proceed to checkout</a>

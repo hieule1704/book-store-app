@@ -111,7 +111,7 @@ if (isset($_POST['order_btn'])) {
                   ?>
                </div>
                <div class="card-footer bg-white text-end fs-5">
-                  Grand total: <span class="fw-bold text-primary">$<?php echo $grand_total; ?>/-</span>
+                  Grand total: <span class="fw-bold text-primary">$<?php echo number_format($grand_total, 0, ',', '.'); ?></span>
                </div>
             </div>
          </div>
