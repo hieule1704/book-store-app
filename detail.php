@@ -94,11 +94,11 @@ if (isset($_POST['buy_now'])) {
                     <div class="card-body">
                         <h2 class="card-title fs-1 fw-bold mb-4"><?php echo $product['name']; ?></h2>
                         <div class="fs-6">
-                            <p>Publisher:</p>
-                            <p>Supplier:</p>
-                            <p>Author:</p>
-                            <p>Publish Year:</p>
-                            <p>Book Layout:</p>
+                            <p>Publisher: <?php echo $product['publisher']; ?></p>
+                            <p>Supplier: <?php echo $product['supplier']; ?></p>
+                            <p>Author: <?php echo $product['author']; ?></p>
+                            <p>Publish Year: <?php echo $product['publication_date']; ?></p>
+                            <p>Hardcover : <?php echo $product['hardcover']; ?> pages</p>
                         </div>
                         <div class="text-danger fw-bold fs-3">Price: $<?php echo number_format($product['price'], 0, ',', '.'); ?></div>
                         <form method="POST">
@@ -110,15 +110,7 @@ if (isset($_POST['buy_now'])) {
                         </form>
                         <div class="mt-3">
                             <h2 class="fs-4">Description</h2>
-                            <p>The annual The White Book is the most authoritative civil procedure resource in England & Wales.
-
-                                The White Book contains the sources of law relating to the practice and procedures of the High Court and the County Court for the handling of civil litigation, subject to the Civil Procedure Rules (CPR), and is supplemented by substantial and comprehensive expert commentary. The White Book is relied upon in court by more judges and lawyers than any other legal text and is trusted for its authority and commentary.
-
-                                The 2025 edition contains the amendments made to the Civil Procedure Rules (CPR) and related legislation which have come into force since publication of the last edition and includes the latest amending CPR SIs and PD Updates; updated Court Guides; and relevant Practice Notes and Guidance. All relevant commentary has been updated, together with recent and important case law, such as Al Sadeq v Dechert LLP [2024] EWCA Civ 28 (Pt 31 – legal professional privilege); Deutsche Bank AG v Sebastian Holdings (Limitation); Morris v Williams & Co Solicitors (A Firm) [2024] EWCA Civ 376 (Pt 19 – multiple claimants & claim forms); Solicitors Regulation Authority Ltd v Khan and Commercial Bank of Dubai PSC v Al Sari (Pt 81 – contempt of court); Dos Santos v Unitel SA [2024] EWCA Civ 1109 (Pt 25 – freezing injunctions); Parsdome Holdings Ltd v Plastic Energy Global SL [2024] EWCA Civ 1293 (Pt 25); and, from the Supreme Court, Re McAleenon, Application for Judicial Review (Northern Ireland) [2024] UKSC 31.
-
-                                Included with The White Book 2025 is the 11th edition of Costs & Funding following the Civil Justice Reforms: Q&A, brought fully up to date with recent costs & funding developments, case law and new questions and answers.
-
-                                The White Book, including supplements, is available in print, eBook powered by Thomson Reuters ProView</p>
+                            <p><?php echo $product['details'] ?></p>
                         </div>
                     </div>
                 </div>

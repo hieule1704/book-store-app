@@ -78,15 +78,17 @@ if (isset($_POST['more_detail'])) {
    <!-- Latest Products Section -->
    <section class="container py-5">
       <h1 class="text-center text-uppercase mb-4">Latest products</h1>
-      <div class="row g-4">
+      <div class="d-flex g-4 row">
          <?php
-         $select_products = mysqli_query($conn, "SELECT * FROM `products` LIMIT 6") or die('query failed');
+         $select_products = mysqli_query($conn, "SELECT * FROM `products` ORDER BY publication_date DESC LIMIT 4") or die('query failed');
          if (mysqli_num_rows($select_products) > 0) {
             while ($fetch_products = mysqli_fetch_assoc($select_products)) {
          ?>
-               <div class="col-md-4 col-sm-6">
-                  <form action="" method="post" class="card w-75 shadow">
-                     <img class="card-img-top p-3" src="uploaded_img/<?php echo $fetch_products['image']; ?>" alt="">
+               <div class="col-md-3 col-sm-6">
+                  <form action="" method="post" class="card w-100 shadow overflow-hidden">
+                     <div class="bg-white d-flex justify-content-center align-items-center p-2" style="height: 250px;">
+                        <img src="uploaded_img/<?php echo $fetch_products['image']; ?>" alt="<?php echo $fetch_products['name']; ?>" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+                     </div>
                      <div class="card-body d-flex flex-column">
                         <div class="mb-2 fw-bold fs-5"><?php echo $fetch_products['name']; ?></div>
                         <div class="mb-2 text-danger fs-5 fw-bold">$<?php echo number_format($fetch_products['price'], 0, ',', '.'); ?></div>
@@ -102,6 +104,7 @@ if (isset($_POST['more_detail'])) {
                      </div>
                   </form>
                </div>
+
          <?php
             }
          } else {
