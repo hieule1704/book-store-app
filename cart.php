@@ -39,67 +39,80 @@ if (isset($_GET['delete_all'])) {
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>Cart</title>
 
+   <!-- Bootstrap 5.3.x CSS -->
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-   <!-- custom css file link  -->
-   <link rel="stylesheet" href="css/style.css">
-
 </head>
 
 <body>
 
    <?php include 'header.php'; ?>
 
-   <div class="heading">
-      <h3>Shopping cart</h3>
-      <p> <a href="home.php">Home</a> / Cart </p>
+   <div class="bg-light py-4 mb-4">
+      <div class="container">
+         <h3 class="mb-1">Shopping cart</h3>
+         <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+               <li class="breadcrumb-item"><a href="home.php">Home</a></li>
+               <li class="breadcrumb-item active" aria-current="page">Cart</li>
+            </ol>
+         </nav>
+      </div>
    </div>
 
-   <section class="shopping-cart">
-
-      <h1 class="title">Products added</h1>
-
-      <div class="box-container">
+   <section class="container py-5">
+      <h1 class="text-center text-uppercase mb-4">Products added</h1>
+      <div class="row g-4">
          <?php
          $grand_total = 0;
          $select_cart = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
          if (mysqli_num_rows($select_cart) > 0) {
             while ($fetch_cart = mysqli_fetch_assoc($select_cart)) {
          ?>
-               <div class="box">
-                  <a href="cart.php?delete=<?php echo $fetch_cart['id']; ?>" class="fas fa-times" onclick="return confirm('delete this from cart?');"></a>
-                  <img src="uploaded_img/<?php echo $fetch_cart['image']; ?>" alt="">
-                  <div class="name"><?php echo $fetch_cart['name']; ?></div>
-                  <div class="price">$<?php echo $fetch_cart['price']; ?>/-</div>
-                  <form action="" method="post">
-                     <input type="hidden" name="cart_id" value="<?php echo $fetch_cart['id']; ?>">
-                     <input type="number" min="1" name="cart_quantity" value="<?php echo $fetch_cart['quantity']; ?>">
-                     <input type="submit" name="update_cart" value="update" class="option-btn">
-                  </form>
-                  <div class="sub-total"> Sub total : <span>$<?php echo $sub_total = ($fetch_cart['quantity'] * $fetch_cart['price']); ?>/-</span> </div>
+               <div class="col-md-4 col-sm-6">
+                  <div class="card shadow h-100">
+                     <div class="card-header d-flex justify-content-end p-2">
+                        <a href="cart.php?delete=<?php echo $fetch_cart['id']; ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('delete this from cart?');">
+                           <i class="fas fa-times"></i>
+                        </a>
+                     </div>
+                     <img src="uploaded_img/<?php echo $fetch_cart['image']; ?>" class="card-img-top" alt="">
+                     <div class="card-body d-flex flex-column">
+                        <div class="fw-bold fs-5 mb-2"><?php echo $fetch_cart['name']; ?></div>
+                        <div class="mb-2 text-danger fw-bold">$<?php echo $fetch_cart['price']; ?>/-</div>
+                        <form action="" method="post" class="d-flex align-items-center mb-2">
+                           <input type="hidden" name="cart_id" value="<?php echo $fetch_cart['id']; ?>">
+                           <input type="number" min="1" name="cart_quantity" value="<?php echo $fetch_cart['quantity']; ?>" class="form-control me-2" style="max-width: 80px;">
+                           <input type="submit" name="update_cart" value="Update" class="btn btn-warning btn-sm">
+                        </form>
+                        <div class="sub-total mb-2">Sub total: <span class="fw-bold">$<?php echo $sub_total = ($fetch_cart['quantity'] * $fetch_cart['price']); ?>/-</span></div>
+                     </div>
+                  </div>
                </div>
          <?php
                $grand_total += $sub_total;
             }
          } else {
-            echo '<p class="empty">your cart is empty</p>';
+            echo '<div class="col-12"><div class="alert alert-info text-center">Your cart is empty</div></div>';
          }
          ?>
       </div>
 
-      <div style="margin-top: 2rem; text-align:center;">
-         <a href="cart.php?delete_all" class="delete-btn <?php echo ($grand_total > 1) ? '' : 'disabled'; ?>" onclick="return confirm('delete all from cart?');">delete all</a>
+      <div class="text-center my-4">
+         <a href="cart.php?delete_all" class="btn btn-danger <?php echo ($grand_total > 1) ? '' : 'disabled'; ?>" onclick="return confirm('delete all from cart?');">Delete all</a>
       </div>
 
-      <div class="cart-total">
-         <p>Grand total : <span>$<?php echo $grand_total; ?>/-</span></p>
-         <div class="flex">
-            <a href="shop.php" class="option-btn">Continue shopping</a>
-            <a href="checkout.php" class="btn <?php echo ($grand_total > 1) ? '' : 'disabled'; ?>">Proceed to checkout</a>
+      <div class="card mx-auto" style="max-width: 400px;">
+         <div class="card-body text-center">
+            <p class="mb-3 fs-5">Grand total: <span class="fw-bold text-primary">$<?php echo $grand_total; ?>/-</span></p>
+            <div class="d-flex justify-content-center gap-2">
+               <a href="shop.php" class="btn btn-warning">Continue shopping</a>
+               <a href="checkout.php" class="btn btn-primary <?php echo ($grand_total > 1) ? '' : 'disabled'; ?>">Proceed to checkout</a>
+            </div>
          </div>
       </div>
-
    </section>
 
 
@@ -111,8 +124,8 @@ if (isset($_GET['delete_all'])) {
 
    <?php include 'footer.php'; ?>
 
-   <!-- custom js file link  -->
-   <script src="js/script.js"></script>
+   <!-- Bootstrap 5.3.x JS Bundle -->
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 

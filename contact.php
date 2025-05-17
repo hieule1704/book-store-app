@@ -38,47 +38,62 @@ if (isset($_POST['send'])) {
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>contact</title>
 
+   <!-- Bootstrap 5.3.x CSS -->
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-   <!-- custom css file link  -->
-   <link rel="stylesheet" href="css/style.css">
-
 </head>
 
 <body>
 
    <?php include 'header.php'; ?>
 
-   <div class="heading">
-      <h3>Contact us</h3>
-      <p> <a href="home.php">Home</a> / Contact </p>
+   <div class="bg-light py-4 mb-4">
+      <div class="container">
+         <h3 class="mb-1">Contact us</h3>
+         <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+               <li class="breadcrumb-item"><a href="home.php">Home</a></li>
+               <li class="breadcrumb-item active" aria-current="page">Contact</li>
+            </ol>
+         </nav>
+      </div>
    </div>
 
-   <section class="contact">
-
-      <form action="" method="post">
-         <h3>Say something!</h3>
-         <input type="text" name="name" required placeholder="Enter your name" class="box">
-         <input type="email" name="email" required placeholder="Enter your email" class="box">
-         <input type="number" name="number" required placeholder="Enter your number" class="box">
-         <textarea name="message" class="box" placeholder="Enter your message" id="" cols="30" rows="10"></textarea>
-         <input type="submit" value="send message" name="send" class="btn">
-      </form>
-
+   <section class="container py-5">
+      <div class="row justify-content-center">
+         <div class="col-lg-6">
+            <div class="card shadow">
+               <div class="card-body">
+                  <h3 class="mb-4 text-center text-uppercase">Say something!</h3>
+                  <form action="" method="post">
+                     <div class="mb-3">
+                        <input type="text" name="name" required placeholder="Enter your name" class="form-control">
+                     </div>
+                     <div class="mb-3">
+                        <input type="email" name="email" required placeholder="Enter your email" class="form-control">
+                     </div>
+                     <div class="mb-3">
+                        <input type="number" name="number" required placeholder="Enter your number" class="form-control">
+                     </div>
+                     <div class="mb-3">
+                        <textarea name="message" class="form-control" placeholder="Enter your message" rows="5"></textarea>
+                     </div>
+                     <div class="d-grid">
+                        <input type="submit" value="Send message" name="send" class="btn btn-primary">
+                     </div>
+                  </form>
+               </div>
+            </div>
+         </div>
+      </div>
    </section>
-
-
-
-
-
-
-
 
    <?php include 'footer.php'; ?>
 
-   <!-- custom js file link  -->
-   <script src="js/script.js"></script>
+   <!-- Bootstrap 5.3.x JS Bundle -->
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 

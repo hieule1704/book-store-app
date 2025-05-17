@@ -59,112 +59,131 @@ if (isset($_POST['order_btn'])) {
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>Checkout</title>
 
+   <!-- Bootstrap 5.3.x CSS -->
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-   <!-- custom css file link  -->
-   <link rel="stylesheet" href="css/style.css">
-
 </head>
 
 <body>
 
    <?php include 'header.php'; ?>
 
-   <div class="heading">
-      <h3>Checkout</h3>
-      <p> <a href="home.php">Home</a> / Checkout </p>
+   <div class="bg-light py-4 mb-4">
+      <div class="container">
+         <h3 class="mb-1">Checkout</h3>
+         <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+               <li class="breadcrumb-item"><a href="home.php">Home</a></li>
+               <li class="breadcrumb-item active" aria-current="page">Checkout</li>
+            </ol>
+         </nav>
+      </div>
    </div>
 
-   <section class="display-order">
-
-      <?php
-      $grand_total = 0;
-      $select_cart = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
-      if (mysqli_num_rows($select_cart) > 0) {
-         while ($fetch_cart = mysqli_fetch_assoc($select_cart)) {
-            $total_price = ($fetch_cart['price'] * $fetch_cart['quantity']);
-            $grand_total += $total_price;
-      ?>
-            <p> <?php echo $fetch_cart['name']; ?> <span>(<?php echo '$' . $fetch_cart['price'] . '/-' . ' x ' . $fetch_cart['quantity']; ?>)</span> </p>
-      <?php
-         }
-      } else {
-         echo '<p class="empty">your cart is empty</p>';
-      }
-      ?>
-      <div class="grand-total"> Grand total : <span>$<?php echo $grand_total; ?>/-</span> </div>
-
-   </section>
-
-   <section class="checkout">
-
-      <form action="" method="post">
-         <h3>Place your order</h3>
-         <div class="flex">
-            <div class="inputBox">
-               <span>Your name :</span>
-               <input type="text" name="name" required placeholder="Enter your name">
-            </div>
-            <div class="inputBox">
-               <span>Your number :</span>
-               <input type="number" name="number" required placeholder="Enter your number">
-            </div>
-            <div class="inputBox">
-               <span>Your email :</span>
-               <input type="email" name="email" required placeholder="Enter your email">
-            </div>
-            <div class="inputBox">
-               <span>Payment method :</span>
-               <select name="method">
-                  <option value="cash on delivery">cash on delivery</option>
-                  <option value="credit card">credit card</option>
-                  <option value="paypal">paypal</option>
-                  <option value="paytm">paytm</option>
-               </select>
-            </div>
-            <div class="inputBox">
-               <span>Flat number :</span>
-               <input type="number" min="0" name="flat" required placeholder="e.g. Flat No. 1">
-            </div>
-            <div class="inputBox">
-               <span>Street name :</span>
-               <input type="text" name="street" required placeholder="e.g. Vo Thi Sau">
-            </div>
-            <div class="inputBox">
-               <span>City :</span>
-               <input type="text" name="city" required placeholder="e.g. Long Xuyen">
-            </div>
-            <div class="inputBox">
-               <span>State / Province :</span>
-               <input type="text" name="state" required placeholder="e.g. An Giang">
-            </div>
-            <div class="inputBox">
-               <span>Country :</span>
-               <input type="text" name="country" required placeholder="e.g. Vietnam">
-            </div>
-            <div class="inputBox">
-               <span>Postal code :</span>
-               <input type="number" min="0" name="pin_code" required placeholder="e.g. 90000">
+   <section class="container mb-5">
+      <div class="row g-4 justify-content-center">
+         <!-- Order Summary Card -->
+         <div class="col-lg-5">
+            <div class="card shadow border-0">
+               <div class="card-header bg-primary text-white text-center">
+                  <h4 class="mb-0 text-uppercase">Order Summary</h4>
+               </div>
+               <div class="card-body">
+                  <?php
+                  $grand_total = 0;
+                  $select_cart = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
+                  if (mysqli_num_rows($select_cart) > 0) {
+                     while ($fetch_cart = mysqli_fetch_assoc($select_cart)) {
+                        $total_price = ($fetch_cart['price'] * $fetch_cart['quantity']);
+                        $grand_total += $total_price;
+                  ?>
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                           <span><?php echo $fetch_cart['name']; ?></span>
+                           <span class="text-secondary">(<?php echo '$' . $fetch_cart['price'] . ' x ' . $fetch_cart['quantity']; ?>)</span>
+                        </div>
+                  <?php
+                     }
+                  } else {
+                     echo '<div class="alert alert-info text-center my-3">Your cart is empty</div>';
+                  }
+                  ?>
+               </div>
+               <div class="card-footer bg-white text-end fs-5">
+                  Grand total: <span class="fw-bold text-primary">$<?php echo $grand_total; ?>/-</span>
+               </div>
             </div>
          </div>
-         <input type="submit" value="order now" class="btn" name="order_btn">
-      </form>
-
+         <!-- Checkout Form Card -->
+         <div class="col-lg-7">
+            <div class="card shadow border-0">
+               <div class="card-header bg-success text-white text-center">
+                  <h4 class="mb-0 text-uppercase">Shipping & Payment</h4>
+               </div>
+               <div class="card-body">
+                  <form action="" method="post">
+                     <div class="row g-3">
+                        <div class="col-md-6">
+                           <label class="form-label">Your name</label>
+                           <input type="text" name="name" required placeholder="Enter your name" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                           <label class="form-label">Your number</label>
+                           <input type="number" name="number" required placeholder="Enter your number" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                           <label class="form-label">Your email</label>
+                           <input type="email" name="email" required placeholder="Enter your email" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                           <label class="form-label">Payment method</label>
+                           <select name="method" class="form-select">
+                              <option value="cash on delivery">Cash on delivery</option>
+                              <option value="credit card">Credit card</option>
+                              <option value="paypal">Paypal</option>
+                              <option value="paytm">Paytm</option>
+                           </select>
+                        </div>
+                        <div class="col-md-6">
+                           <label class="form-label">Flat number</label>
+                           <input type="number" min="0" name="flat" required placeholder="e.g. Flat No. 1" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                           <label class="form-label">Street name</label>
+                           <input type="text" name="street" required placeholder="e.g. Vo Thi Sau" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                           <label class="form-label">City</label>
+                           <input type="text" name="city" required placeholder="e.g. Long Xuyen" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                           <label class="form-label">State / Province</label>
+                           <input type="text" name="state" required placeholder="e.g. An Giang" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                           <label class="form-label">Country</label>
+                           <input type="text" name="country" required placeholder="e.g. Vietnam" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                           <label class="form-label">Postal code</label>
+                           <input type="number" min="0" name="pin_code" required placeholder="e.g. 90000" class="form-control">
+                        </div>
+                     </div>
+                     <div class="d-grid mt-4">
+                        <input type="submit" value="Order now" class="btn btn-success btn-lg" name="order_btn" <?php echo ($grand_total == 0) ? 'disabled' : ''; ?>>
+                     </div>
+                  </form>
+               </div>
+            </div>
+         </div>
+      </div>
    </section>
-
-
-
-
-
-
-
-
 
    <?php include 'footer.php'; ?>
 
-   <!-- custom js file link  -->
-   <script src="js/script.js"></script>
+   <!-- Bootstrap 5.3.x JS Bundle -->
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 
