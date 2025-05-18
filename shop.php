@@ -46,6 +46,8 @@ if (isset($_POST['add_to_cart'])) {
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
+   <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
@@ -68,25 +70,32 @@ if (isset($_POST['add_to_cart'])) {
       <h1 class="text-center text-uppercase mb-4">Latest Books</h1>
       <div class="row g-4">
          <?php
-         $select_products = mysqli_query($conn, "SELECT * FROM `products`") or die('query failed');
+         $select_products = mysqli_query($conn, "SELECT p.*, a.author_name, pub.publisher_name FROM `products` p
+            LEFT JOIN `author` a ON p.author_id = a.id
+            LEFT JOIN `publisher` pub ON p.publisher_id = pub.id") or die('query failed');
          if (mysqli_num_rows($select_products) > 0) {
             while ($fetch_products = mysqli_fetch_assoc($select_products)) {
          ?>
-               <div class="col-md-3 col-sm-6">
-                  <form action="" method="post" class="card h-100 shadow">
-                     <img class="card-img-top" src="uploaded_img/<?php echo $fetch_products['image']; ?>" alt="">
-                     <div class="card-body d-flex flex-column">
-                        <div class="mb-2 fw-bold fs-5"><?php echo $fetch_products['book_name']; ?></div>
-                        <div class="mb-2 text-danger fw-bold">$<?php echo $fetch_products['price']; ?>/-</div>
-                        <?php if (!empty($fetch_products['book_description'])): ?>
-                           <div class="mb-2 small text-muted"><?php echo $fetch_products['book_description']; ?></div>
-                        <?php endif; ?>
-                        <input type="number" min="1" name="product_quantity" value="1" class="form-control mb-2" style="max-width:120px;">
-                        <input type="hidden" name="product_id" value="<?php echo $fetch_products['id']; ?>">
-                        <input type="hidden" name="product_name" value="<?php echo $fetch_products['book_name']; ?>">
-                        <input type="hidden" name="product_price" value="<?php echo $fetch_products['price']; ?>">
-                        <input type="hidden" name="product_image" value="<?php echo $fetch_products['image']; ?>">
-                        <button type="submit" name="add_to_cart" class="btn btn-primary mt-auto">Add to cart</button>
+               <div class="col-md-3 col-sm-6 mb-4 align-items-stretch">
+                  <form action="" method="post" class="card shadow">
+                     <a href="detail.php?id=<?php echo htmlspecialchars($fetch_products['id']); ?>" class="bg-white d-flex justify-content-center align-items-center p-2" style="height: 250px;">
+                        <img src="uploaded_img/<?php echo $fetch_products['image']; ?>" alt="<?php echo htmlspecialchars($fetch_products['book_name']); ?>" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+                     </a>
+                     <div class="card-body d-flex flex-column text-center">
+                        <div title="<?php echo htmlspecialchars($fetch_products['book_name']); ?>" class="mb-2 fw-bold fs-5 line-clamp-2"><?php echo htmlspecialchars($fetch_products['book_name']); ?></div>
+                        <div class="mb-2 text-secondary small">
+                           <span><i class="fa-solid fa-user"></i> <?php echo htmlspecialchars($fetch_products['author_name']); ?></span>
+                           <span class="ms-2"><i class="fa-solid fa-building"></i> <?php echo htmlspecialchars($fetch_products['publisher_name']); ?></span>
+                        </div>
+                        <div class="mb-2 text-danger fs-5 fw-bold">$<?php echo number_format($fetch_products['price'], 0, ',', '.'); ?></div>
+                        <div class="mt-auto">
+                           <input type="hidden" min="1" name="product_quantity" value="1" class="form-control mb-2" style="max-width:120px;">
+                           <input type="hidden" name="product_id" value="<?php echo $fetch_products['id']; ?>">
+                           <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($fetch_products['book_name']); ?>">
+                           <input type="hidden" name="product_price" value="<?php echo $fetch_products['price']; ?>">
+                           <input type="hidden" name="product_image" value="<?php echo $fetch_products['image']; ?>">
+                           <button type="submit" name="add_to_cart" class="btn btn-primary w-100">Add to cart</button>
+                        </div>
                      </div>
                   </form>
                </div>
