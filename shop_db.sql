@@ -66,7 +66,7 @@ CREATE TABLE `cart` (
 --
 
 CREATE TABLE `message` (
-  `id` int(100) NOT NULL,
+  `id` int(100) NOT NULL AUTO_INCREMENT,
   `user_id` int(100) NOT NULL,
   `name` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
