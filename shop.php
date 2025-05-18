@@ -12,11 +12,13 @@ if (!isset($user_id)) {
 
 if (isset($_POST['add_to_cart'])) {
 
+   $product_id = $_POST['product_id'];
    $product_name = $_POST['product_name'];
    $product_price = $_POST['product_price'];
    $product_image = $_POST['product_image'];
    $product_quantity = $_POST['product_quantity'];
 
+   // Check if product already in cart for this user
    $check_cart_numbers = mysqli_query($conn, "SELECT * FROM `cart` WHERE name = '$product_name' AND user_id = '$user_id'") or die('query failed');
 
    if (mysqli_num_rows($check_cart_numbers) > 0) {
@@ -44,9 +46,6 @@ if (isset($_POST['add_to_cart'])) {
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-   <!-- custom css file link  -->
-   <!-- <link rel="stylesheet" href="css/style.css"> -->
-
 </head>
 
 <body>
@@ -66,7 +65,7 @@ if (isset($_POST['add_to_cart'])) {
    </div>
 
    <section class="container py-5">
-      <h1 class="text-center text-uppercase mb-4">Latest products</h1>
+      <h1 class="text-center text-uppercase mb-4">Latest Books</h1>
       <div class="row g-4">
          <?php
          $select_products = mysqli_query($conn, "SELECT * FROM `products`") or die('query failed');
@@ -77,10 +76,14 @@ if (isset($_POST['add_to_cart'])) {
                   <form action="" method="post" class="card h-100 shadow">
                      <img class="card-img-top" src="uploaded_img/<?php echo $fetch_products['image']; ?>" alt="">
                      <div class="card-body d-flex flex-column">
-                        <div class="mb-2 fw-bold fs-5"><?php echo $fetch_products['name']; ?></div>
+                        <div class="mb-2 fw-bold fs-5"><?php echo $fetch_products['book_name']; ?></div>
                         <div class="mb-2 text-danger fw-bold">$<?php echo $fetch_products['price']; ?>/-</div>
+                        <?php if (!empty($fetch_products['book_description'])): ?>
+                           <div class="mb-2 small text-muted"><?php echo $fetch_products['book_description']; ?></div>
+                        <?php endif; ?>
                         <input type="number" min="1" name="product_quantity" value="1" class="form-control mb-2" style="max-width:120px;">
-                        <input type="hidden" name="product_name" value="<?php echo $fetch_products['name']; ?>">
+                        <input type="hidden" name="product_id" value="<?php echo $fetch_products['id']; ?>">
+                        <input type="hidden" name="product_name" value="<?php echo $fetch_products['book_name']; ?>">
                         <input type="hidden" name="product_price" value="<?php echo $fetch_products['price']; ?>">
                         <input type="hidden" name="product_image" value="<?php echo $fetch_products['image']; ?>">
                         <button type="submit" name="add_to_cart" class="btn btn-primary mt-auto">Add to cart</button>
@@ -90,7 +93,7 @@ if (isset($_POST['add_to_cart'])) {
          <?php
             }
          } else {
-            echo '<div class="col-12"><div class="alert alert-info text-center">No products added yet!</div></div>';
+            echo '<div class="col-12"><div class="alert alert-info text-center">No books added yet!</div></div>';
          }
          ?>
       </div>
