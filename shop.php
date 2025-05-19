@@ -29,6 +29,12 @@ if (isset($_POST['add_to_cart'])) {
    }
 }
 
+if (isset($_POST['more_detail'])) {
+   $product_id = $_POST['product_id'];
+   header("Location: detail.php?id=$product_id");
+   exit();
+}
+
 ?>
 
 <!DOCTYPE html>

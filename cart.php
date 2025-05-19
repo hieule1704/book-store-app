@@ -14,7 +14,7 @@ if (isset($_POST['update_cart'])) {
    $cart_id = $_POST['cart_id'];
    $cart_quantity = $_POST['cart_quantity'];
    mysqli_query($conn, "UPDATE `cart` SET quantity = '$cart_quantity' WHERE id = '$cart_id'") or die('query failed');
-   $message[] = 'cart quantity updated!';
+   $message[] = 'Cart quantity updated!';
 }
 
 if (isset($_GET['delete'])) {
@@ -93,30 +93,31 @@ if (isset($_GET['delete_all'])) {
                         </form>
                         <div class="sub-total mb-2">Sub total: <span class="fw-bold">$<?php echo number_format($sub_total = ($fetch_cart['quantity'] * $fetch_cart['price']), 0, ',', '.'); ?></span></div>
                      </div>
+                     </form>
                   </div>
-               </div>
-         <?php
+            <?php
                $grand_total += $sub_total;
             }
          } else {
             echo '<div class="col-12"><div class="alert alert-info text-center">Your cart is empty</div></div>';
          }
-         ?>
-      </div>
+            ?>
+               </div>
 
-      <div class="text-center my-4">
-         <a href="cart.php?delete_all" class="btn btn-danger <?php echo ($grand_total > 1) ? '' : 'disabled'; ?>" onclick="return confirm('delete all from cart?');">Delete all</a>
-      </div>
+               <div class="text-center my-4">
+                  <a href="cart.php?delete_all" class="btn btn-danger <?php echo ($grand_total > 1) ? '' : 'disabled'; ?>" onclick="return confirm('delete all from cart?');">Delete all</a>
+               </div>
 
-      <div class="card mx-auto" style="max-width: 400px;">
-         <div class="card-body text-center">
-            <p class="mb-3 fs-5">Grand total: <span class="fw-bold text-primary">$<?php echo number_format($grand_total, 0, ',', '.'); ?></span></p>
-            <div class="d-flex justify-content-center gap-2">
-               <a href="shop.php" class="btn btn-warning">Continue shopping</a>
-               <a href="checkout.php" class="btn btn-primary <?php echo ($grand_total > 1) ? '' : 'disabled'; ?>">Proceed to checkout</a>
-            </div>
-         </div>
-      </div>
+               <div class="card mx-auto" style="max-width: 400px;">
+                  <div class="card-body text-center">
+                     <p class="mb-3 fs-5">Grand total: <span class="fw-bold text-primary">$<?php echo number_format($grand_total, 0, ',', '.'); ?></span></p>
+                     <p class="mb-3 fs-5">Grand total: <span class="fw-bold text-primary">$<?php echo number_format($grand_total, 0, ',', '.'); ?></span></p>
+                     <div class="d-flex justify-content-center gap-2">
+                        <a href="shop.php" class="btn btn-warning">Continue shopping</a>
+                        <a href="checkout.php" class="btn btn-primary <?php echo ($grand_total > 1) ? '' : 'disabled'; ?>">Proceed to checkout</a>
+                     </div>
+                  </div>
+               </div>
    </section>
 
 

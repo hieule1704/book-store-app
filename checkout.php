@@ -40,6 +40,7 @@ if (isset($_POST['order_btn'])) {
    } else {
       if (mysqli_num_rows($order_query) > 0) {
          $message[] = 'order already placed!';
+         header('location:cart.php');
       } else {
          mysqli_query($conn, "INSERT INTO `orders`(user_id, name, number, email, method, address, total_products, total_price, placed_on) VALUES('$user_id', '$name', '$number', '$email', '$method', '$address', '$total_products', '$cart_total', '$placed_on')") or die('query failed');
          $message[] = 'order placed successfully!';
@@ -111,7 +112,7 @@ if (isset($_POST['order_btn'])) {
                   ?>
                </div>
                <div class="card-footer bg-white text-end fs-5">
-                  Grand total: <span class="fw-bold text-primary">$<?php echo $grand_total; ?>/-</span>
+                  Grand total: <span class="fw-bold text-primary">$<?php echo number_format($grand_total, 0, ',', '.'); ?></span>
                </div>
             </div>
          </div>

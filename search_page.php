@@ -27,6 +27,12 @@ if (isset($_POST['add_to_cart'])) {
    }
 };
 
+if (isset($_POST['more_detail'])) {
+   $product_id = $_POST['product_id'];
+   header("Location: detail.php?id=$product_id");
+   exit();
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -80,16 +86,20 @@ if (isset($_POST['add_to_cart'])) {
                while ($fetch_product = mysqli_fetch_assoc($select_products)) {
          ?>
                   <div class="col-md-4 col-sm-6">
-                     <form action="" method="post" class="card h-100 shadow">
-                        <img src="uploaded_img/<?php echo $fetch_product['image']; ?>" alt="" class="card-img-top">
+                     <form action="" method="post" class="card w-75 shadow">
+                        <img class="card-img-top p-3" src="uploaded_img/<?php echo $fetch_product['image']; ?>" alt="">
                         <div class="card-body d-flex flex-column">
-                           <div class="fw-bold fs-5 mb-2"><?php echo $fetch_product['name']; ?></div>
-                           <div class="mb-2 text-danger fw-bold">$<?php echo $fetch_product['price']; ?>/-</div>
-                           <input type="number" class="form-control mb-2" name="product_quantity" min="1" value="1" style="max-width:120px;">
+                           <div class="mb-2 fw-bold fs-5"><?php echo $fetch_product['name']; ?></div>
+                           <div class="mb-2 text-danger fs-5 fw-bold">$<?php echo number_format($fetch_product['price'], 0, ',', '.'); ?></div>
+                           <input type="number" min="1" name="product_quantity" value="1" class="form-control mb-2" style="max-width:120px;">
                            <input type="hidden" name="product_name" value="<?php echo $fetch_product['name']; ?>">
                            <input type="hidden" name="product_price" value="<?php echo $fetch_product['price']; ?>">
                            <input type="hidden" name="product_image" value="<?php echo $fetch_product['image']; ?>">
-                           <button type="submit" class="btn btn-primary mt-auto" name="add_to_cart">Add to cart</button>
+                           <input type="hidden" name="product_id" value="<?php echo $fetch_product['id']; ?>">
+                           <div class="d-flex align-items-center mt-2">
+                              <button type="submit" name="add_to_cart" class="btn btn-primary">Add to cart</button>
+                              <button type="submit" name="more_detail" class="btn btn-warning ms-3">More detail</button>
+                           </div>
                         </div>
                      </form>
                   </div>

@@ -29,6 +29,12 @@ if (isset($_POST['add_to_cart'])) {
    }
 }
 
+if (isset($_POST['more_detail'])) {
+   $product_id = $_POST['product_id'];
+   header("Location: detail.php?id=$product_id");
+   exit();
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -140,7 +146,7 @@ if (isset($_POST['add_to_cart'])) {
    <!-- Latest Products Section -->
    <section class="container py-5">
       <h1 class="text-center text-uppercase mb-4">Latest products</h1>
-      <div class="row g-4">
+      <div class="d-flex g-4 row">
          <?php
          // Updated query to use new products table structure
          $select_products = mysqli_query($conn, "SELECT p.*, a.author_name, pub.publisher_name FROM `products` p
@@ -221,6 +227,7 @@ if (isset($_POST['add_to_cart'])) {
                      </div>
                   </form>
                </div>
+
          <?php
             }
          } else {
