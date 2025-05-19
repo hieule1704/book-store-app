@@ -59,6 +59,21 @@ if (isset($_POST['more_detail'])) {
    <!-- custom css file link  -->
    <link rel="stylesheet" href="style.css">
 
+   <style>
+      /* Add this CSS for product card hover effect */
+      .product-card {
+         transition: transform 0.25s cubic-bezier(.4, 2, .6, 1), box-shadow 0.25s;
+         will-change: transform;
+         z-index: 1;
+      }
+
+      .product-card:hover {
+         transform: scale(1.06) translateY(-8px);
+         box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+         z-index: 2;
+      }
+   </style>
+
 </head>
 
 
@@ -162,7 +177,7 @@ if (isset($_POST['more_detail'])) {
             while ($fetch_products = mysqli_fetch_assoc($select_products)) {
          ?>
                <div class="col-md-3 col-sm-6 mb-4 align-items-stretch">
-                  <form action="" method="post" class="card shadow">
+                  <form action="" method="post" class="card shadow product-card">
                      <a href="detail.php?id=<?php echo htmlspecialchars($fetch_products['id']); ?>" class="bg-white d-flex justify-content-center align-items-center p-2" style="height: 250px;">
                         <img src="uploaded_img/<?php echo $fetch_products['image']; ?>" alt="<?php echo htmlspecialchars($fetch_products['book_name']); ?>" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;">
                      </a>
@@ -211,7 +226,7 @@ if (isset($_POST['more_detail'])) {
             while ($fetch_products = mysqli_fetch_assoc($select_products)) {
          ?>
                <div class="col-md-3 col-sm-6 mb-4 align-items-stretch">
-                  <form action="" method="post" class="card shadow">
+                  <form action="" method="post" class="card shadow  product-card">
                      <a href="detail.php?id=<?php echo htmlspecialchars($fetch_products['id']); ?>" class="bg-white d-flex justify-content-center align-items-center p-2" style="height: 250px;">
                         <img src="uploaded_img/<?php echo $fetch_products['image']; ?>" alt="<?php echo htmlspecialchars($fetch_products['book_name']); ?>" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;">
                      </a>
