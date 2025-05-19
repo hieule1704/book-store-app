@@ -24,6 +24,32 @@ if (isset($_GET['delete'])) {
    header('location:admin_orders.php');
 }
 
+if (isset($_GET['export']) && $_GET['export'] == 1) {
+   header('Content-Type: text/csv; charset=utf-8');
+   header('Content-Disposition: attachment; filename=orders_export_' . date('Ymd_His') . '.csv');
+   $output = fopen('php://output', 'w');
+   // Column headers
+   fputcsv($output, ['ID', 'User ID', 'Placed On', 'Name', 'Number', 'Email', 'Address', 'Total Products', 'Total Price', 'Payment Method', 'Payment Status']);
+   $orders = mysqli_query($conn, "SELECT * FROM `orders`");
+   while ($row = mysqli_fetch_assoc($orders)) {
+      fputcsv($output, [
+         $row['id'],
+         $row['user_id'],
+         $row['placed_on'],
+         $row['name'],
+         $row['number'],
+         $row['email'],
+         $row['address'],
+         $row['total_products'],
+         $row['total_price'],
+         $row['method'],
+         $row['payment_status']
+      ]);
+   }
+   fclose($output);
+   exit();
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -52,6 +78,11 @@ if (isset($_GET['delete'])) {
 
    <section class="container my-5">
       <h1 class="text-center text-uppercase mb-4">Placed Orders</h1>
+      <div class="mb-3 text-end">
+         <a href="admin_orders.php?export=1" class="btn btn-success">
+            <i class="fa fa-file-excel"></i> Export to Excel
+         </a>
+      </div>
       <div class="row g-4">
          <?php
          $select_orders = mysqli_query($conn, "SELECT * FROM `orders`") or die('query failed');
