@@ -49,11 +49,14 @@ if (isset($_POST['more_detail'])) {
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>home</title>
 
+   <!-- Bootstrap 5.3.x CSS -->
    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
 
+   <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
+   <!-- custom css file link  -->
    <link rel="stylesheet" href="style.css">
 
 </head>
@@ -63,6 +66,7 @@ if (isset($_POST['more_detail'])) {
 
    <?php include 'header.php'; ?>
 
+   <!-- Hero Section -->
    <section class="bg-light py-5">
       <div class="container">
          <div class="row align-items-center">
@@ -78,6 +82,7 @@ if (isset($_POST['more_detail'])) {
       </div>
    </section>
 
+   <!-- Featured Book Ribbon Carousel (Images Only) -->
    <section class="py-4" style="width:100vw; max-width:100vw; margin-left:calc(-50vw + 50%); background: #f8f9fa;">
       <div class="container-fluid px-0">
          <div id="bookRibbonCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
@@ -143,15 +148,16 @@ if (isset($_POST['more_detail'])) {
       </div>
    </section>
 
+   <!-- Latest Products Section -->
    <section class="container py-5">
       <h1 class="text-center text-uppercase mb-4">Latest products</h1>
       <div class="d-flex g-4 row">
          <?php
          // Updated query to use new products table structure
          $select_products = mysqli_query($conn, "SELECT p.*, a.author_name, pub.publisher_name FROM `products` p
-                LEFT JOIN `author` a ON p.author_id = a.id
-                LEFT JOIN `publisher` pub ON p.publisher_id = pub.id
-                ORDER BY p.id DESC LIMIT 8") or die('query failed');
+            LEFT JOIN `author` a ON p.author_id = a.id
+            LEFT JOIN `publisher` pub ON p.publisher_id = pub.id
+            ORDER BY p.id DESC LIMIT 8") or die('query failed');
          if (mysqli_num_rows($select_products) > 0) {
             while ($fetch_products = mysqli_fetch_assoc($select_products)) {
          ?>
@@ -190,15 +196,16 @@ if (isset($_POST['more_detail'])) {
       </div>
    </section>
 
+   <!-- Best seller Section -->
    <section class="container py-5">
       <h1 class="text-center text-uppercase mb-4">Best seller</h1>
       <div class="row g-4">
          <?php
          // Updated query to use new products table structure
          $select_products = mysqli_query($conn, "SELECT p.*, a.author_name, pub.publisher_name FROM `products` p
-                LEFT JOIN `author` a ON p.author_id = a.id
-                LEFT JOIN `publisher` pub ON p.publisher_id = pub.id
-                WHERE tag = 'bestseller' LIMIT 8") or die('query failed');
+            LEFT JOIN `author` a ON p.author_id = a.id
+            LEFT JOIN `publisher` pub ON p.publisher_id = pub.id
+            WHERE tag = 'bestseller' LIMIT 8") or die('query failed');
          if (mysqli_num_rows($select_products) > 0) {
             while ($fetch_products = mysqli_fetch_assoc($select_products)) {
          ?>
@@ -225,6 +232,7 @@ if (isset($_POST['more_detail'])) {
                      </div>
                   </form>
                </div>
+
          <?php
             }
          } else {
@@ -237,6 +245,7 @@ if (isset($_POST['more_detail'])) {
       </div>
    </section>
 
+   <!-- About Section -->
    <section class="container py-5">
       <div class="row align-items-center">
          <div class="col-lg-6 mb-4 mb-lg-0">
@@ -251,9 +260,25 @@ if (isset($_POST['more_detail'])) {
       </div>
    </section>
 
+   <!-- Contact Section -->
    <section class="bg-light py-5">
       <div class="container">
          <div class="row justify-content-center">
             <div class="col-lg-8 text-center">
                <h3 class="fw-bold mb-3">Have any questions?</h3>
-               <p class="mb-4">We'
+               <p class="mb-4">We're here to help! If you have any questions about our books, your order, or anything else, feel free to reach out to us anytime.</p>
+               <a href="contact.php" class="btn btn-outline-primary btn-lg">Contact us</a>
+            </div>
+         </div>
+      </div>
+   </section>
+
+   <?php include 'footer.php'; ?>
+
+   <!-- Bootstrap 5.3.x JS Bundle -->
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+
+</html>
