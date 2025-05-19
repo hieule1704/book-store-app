@@ -2,9 +2,9 @@
 if (isset($message)) {
   foreach ($message as $message) {
     echo '
-      <div class="message">
+      <div class="alert alert-info alert-dismissible fade show position-absolute top-0 start-50 translate-middle-x mt-3" role="alert" style="z-index:1050; min-width:300px;">
          <span>' . $message . '</span>
-         <i class="fas fa-times" onclick="this.parentElement.remove();"></i>
+         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
       ';
   }
@@ -57,6 +57,11 @@ if (isset($message)) {
           <li class="nav-item">
             <a class="nav-link" href="admin_publishers.php">
               <i class="fas fa-building me-1"></i> Publisher
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="admin_statistics.php">
+              <i class="fas fa-chart-bar me-1"></i>Statistics
             </a>
           </li>
         </ul>

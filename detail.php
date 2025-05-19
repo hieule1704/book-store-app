@@ -28,6 +28,7 @@ if (isset($_POST['add_to_cart'])) {
     $product_price = $product['price'];
     $product_image = $product['image'];
     $product_quantity = $_POST['product_quantity'];
+    echo $product_quantity;
 
     $check_cart_numbers = mysqli_query($conn, "SELECT * FROM `cart` WHERE name = '$product_name' AND user_id = '$user_id'") or die('query failed');
 
@@ -38,21 +39,6 @@ if (isset($_POST['add_to_cart'])) {
         $message[] = 'Đã thêm vào giỏ hàng!';
     }
 }
-
-if (isset($_POST['buy_now'])) {
-    $product_name = $product['book_name'];
-    $product_price = $product['price'];
-    $product_image = $product['image'];
-    $product_quantity = $_POST['product_quantity'];
-
-    $check_cart_numbers = mysqli_query($conn, "SELECT * FROM `cart` WHERE name = '$product_name' AND user_id = '$user_id'") or die('query failed');
-
-    if (mysqli_num_rows($check_cart_numbers) == 0) {
-        mysqli_query($conn, "INSERT INTO `cart`(user_id, name, price, quantity, image) VALUES('$user_id', '$product_name', '$product_price', '$product_quantity', '$product_image')") or die('query failed');
-    }
-    header('location:cart.php');
-}
-
 ?>
 
 <!DOCTYPE html>
@@ -108,9 +94,14 @@ if (isset($_POST['buy_now'])) {
                         <div class="text-danger fw-bold fs-3">Price: $<?php echo number_format($product['price'], 0, ',', '.'); ?></div>
                         <form method="POST">
                             <div class="d-flex align-items-center mt-4">
+                                <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                                <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($product['book_name']); ?>">
+                                <input type="hidden" name="product_price" value="<?php echo $product['price']; ?>">
+                                <input type="hidden" name="product_image" value="<?php echo $product['image']; ?>">
+                                <input type="hidden" name="product_quantity" value="1">
                                 <input type="number" min="1" name="product_quantity" value="1" class="form-control" style="max-width:120px;">
                                 <button type="submit" name="add_to_cart" class="btn btn-primary btn-lg ms-2">Add to cart</button>
-                                <button type="submit" name="buy_now" class="btn btn-danger btn-lg ms-2">Buy now</button>
+                                <button type="submit" name="buy_now" formaction="checkout.php" formmethod="post" class="btn btn-danger btn-lg ms-2">Buy now</button>
                             </div>
                         </form>
                         <div class="mt-3">
