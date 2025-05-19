@@ -23,7 +23,7 @@ if (isset($_POST['add_blog'])) {
     $image_tmp = $_FILES['image']['tmp_name'];
     $image_folder = 'uploaded_img/' . $image;
 
-    if (!isset($content)) {
+    if ($content != "") {
         $add_blog = mysqli_query($conn, "INSERT INTO `blogs`(title, content, image, author_id) VALUES('$title', '$content', '$image', '$author_id')") or die('query failed');
         if ($add_blog) {
             if (!empty($image)) {
@@ -34,7 +34,7 @@ if (isset($_POST['add_blog'])) {
             $message[] = 'Failed to add blog!';
         }
     } else {
-        $message[] = 'Content is null!';
+        $message[] = "$content";
     }
 }
 
