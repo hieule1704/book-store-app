@@ -8,7 +8,7 @@ if (isset($_POST['submit'])) {
    $email = mysqli_real_escape_string($conn, $_POST['email']);
    $pass = mysqli_real_escape_string($conn, md5($_POST['password']));
    $cpass = mysqli_real_escape_string($conn, md5($_POST['cpassword']));
-   $user_type = $_POST['user_type'];
+   $user_type = 'user'; // Always set as 'user'
 
    $select_users = mysqli_query($conn, "SELECT * FROM `users` WHERE email = '$email' AND password = '$pass'") or die('Query failed: ' . mysqli_error($conn));
 
@@ -37,50 +37,58 @@ if (isset($_POST['submit'])) {
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>Register</title>
 
+   <!-- Bootstrap 5.3.x CSS -->
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
    <!-- custom css file link  -->
-   <link rel="stylesheet" href="css/style.css">
+   <!-- <link rel="stylesheet" href="css/style.css"> -->
 
 </head>
 
-<body>
-
-
+<body class="bg-light">
 
    <?php
    if (isset($message)) {
-      foreach ($message as $message) {
+      foreach ($message as $msg) {
          echo '
-      <div class="message">
-         <span>' . $message . '</span>
-         <i class="fas fa-times" onclick="this.parentElement.remove();"></i>
+      <div class="alert alert-warning alert-dismissible fade show position-absolute top-0 start-50 translate-middle-x mt-3" role="alert" style="z-index:1050; min-width:300px;">
+         <span>' . $msg . '</span>
+         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
       ';
       }
    }
    ?>
 
-   <div class="form-container">
-
-      <!-- <form action="" method="post">  Gửi dữ liệu về chính trang hiện tại để xử lý -->
-      <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post"> <!-- Gửi dữ liệu về chính trang hiện tại để xử lý, An toàn (chống XSS), rõ ràng -->
-         <h3>register now</h3>
-         <input type="text" name="name" placeholder="enter your name" required class="box">
-         <input type="email" name="email" placeholder="enter your email" required class="box">
-         <input type="password" name="password" placeholder="enter your password" required class="box">
-         <input type="password" name="cpassword" placeholder="confirm your password" required class="box">
-         <select name="user_type" class="box">
-            <option value="user">user</option>
-            <option value="admin">admin</option>
-         </select>
-         <input type="submit" name="submit" value="register now" class="btn">
-         <p>already have an account? <a href="login.php">login now</a></p>
-      </form>
-
+   <div class="container d-flex align-items-center justify-content-center min-vh-100">
+      <div class="card shadow p-4" style="max-width: 400px; width: 100%;">
+         <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
+            <h3 class="mb-4 text-center text-uppercase">Register now</h3>
+            <div class="mb-3">
+               <input type="text" name="name" placeholder="Enter your name" required class="form-control">
+            </div>
+            <div class="mb-3">
+               <input type="email" name="email" placeholder="Enter your email" required class="form-control">
+            </div>
+            <div class="mb-3">
+               <input type="password" name="password" placeholder="Enter your password" required class="form-control">
+            </div>
+            <div class="mb-3">
+               <input type="password" name="cpassword" placeholder="Confirm your password" required class="form-control">
+            </div>
+            <div class="d-grid mb-3">
+               <input type="submit" name="submit" value="Register now" class="btn btn-primary">
+            </div>
+            <p class="text-center mb-0">Already have an account? <a href="login.php">Login now</a></p>
+         </form>
+      </div>
    </div>
 
+   <!-- Bootstrap 5.3.x JS Bundle -->
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

@@ -27,53 +27,52 @@ if (isset($_GET['delete'])) {
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>Users</title>
 
+   <!-- Bootstrap 5.3.x CSS -->
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
    <!-- custom admin css file link  -->
-   <link rel="stylesheet" href="css/admin_style.css">
+   <!-- <link rel="stylesheet" href="css/admin_style.css"> -->
 
 </head>
 
-<body>
+<body class="bg-light">
 
    <?php include 'admin_header.php'; ?>
 
-   <section class="users">
-
-      <h1 class="title"> User accounts </h1>
-
-      <div class="box-container">
+   <section class="container my-5">
+      <h1 class="text-center text-uppercase mb-4">User Accounts</h1>
+      <div class="row g-4">
          <?php
          $select_users = mysqli_query($conn, "SELECT * FROM `users`") or die('query failed');
          while ($fetch_users = mysqli_fetch_assoc($select_users)) {
          ?>
-            <div class="box">
-               <p> User id : <span><?php echo $fetch_users['id']; ?></span> </p>
-               <p> Username : <span><?php echo $fetch_users['name']; ?></span> </p>
-               <p> Rmail : <span><?php echo $fetch_users['email']; ?></span> </p>
-               <p> User type : <span style="color:<?php if ($fetch_users['user_type'] == 'admin') {
-                                                      echo 'var(--orange)';
-                                                   } ?>"><?php echo $fetch_users['user_type']; ?></span> </p>
-               <a href="admin_users.php?delete=<?php echo $fetch_users['id']; ?>" onclick="return confirm('delete this user?');" class="delete-btn">delete user</a>
+            <div class="col-md-4 col-sm-6">
+               <div class="card shadow h-100">
+                  <div class="card-body">
+                     <p class="mb-1"><strong>User ID:</strong> <span><?php echo $fetch_users['id']; ?></span></p>
+                     <p class="mb-1"><strong>Username:</strong> <span><?php echo $fetch_users['name']; ?></span></p>
+                     <p class="mb-1"><strong>Email:</strong> <span><?php echo $fetch_users['email']; ?></span></p>
+                     <p class="mb-3">
+                        <strong>User type:</strong>
+                        <span class="<?php echo ($fetch_users['user_type'] == 'admin') ? 'text-warning fw-bold' : 'text-secondary'; ?>">
+                           <?php echo $fetch_users['user_type']; ?>
+                        </span>
+                     </p>
+                     <a href="admin_users.php?delete=<?php echo $fetch_users['id']; ?>" onclick="return confirm('delete this user?');" class="btn btn-danger w-100">Delete user</a>
+                  </div>
+               </div>
             </div>
          <?php
          };
          ?>
       </div>
-
    </section>
 
-
-
-
-
-
-
-
-
-   <!-- custom admin js file link  -->
-   <script src="js/admin_script.js"></script>
+   <!-- Bootstrap 5.3.x JS Bundle -->
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 
