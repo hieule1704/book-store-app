@@ -173,13 +173,14 @@ if (isset($_POST['more_detail'])) {
                            <span class="ms-2"><i class="fa-solid fa-building"></i> <?php echo htmlspecialchars($fetch_products['publisher_name']); ?></span>
                         </div>
                         <div class="mb-2 text-danger fs-5 fw-bold">$<?php echo number_format($fetch_products['price'], 0, ',', '.'); ?></div>
-                        <div class="mt-auto">
-                           <input type="hidden" min="1" name="product_quantity" value="1" class="form-control mb-2" style="max-width:120px;">
-                           <input type="hidden" name="product_id" value="<?php echo $fetch_products['id']; ?>">
-                           <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($fetch_products['book_name']); ?>">
-                           <input type="hidden" name="product_price" value="<?php echo $fetch_products['price']; ?>">
-                           <input type="hidden" name="product_image" value="<?php echo $fetch_products['image']; ?>">
-                           <button type="submit" name="add_to_cart" class="btn btn-primary w-100">Add to cart</button>
+                        <input type="hidden" name="product_id" value="<?php echo $fetch_products['id']; ?>">
+                        <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($fetch_products['book_name']); ?>">
+                        <input type="hidden" name="product_price" value="<?php echo $fetch_products['price']; ?>">
+                        <input type="hidden" name="product_image" value="<?php echo $fetch_products['image']; ?>">
+                        <input type="hidden" name="product_quantity" value="1">
+                        <div class="mt-auto d-flex gap-2">
+                           <button type="submit" name="add_to_cart" class="btn btn-primary w-50">Add to cart</button>
+                           <button type="submit" name="buy_now" formaction="checkout.php" formmethod="post" class="btn btn-success w-50">Buy now</button>
                         </div>
                      </div>
                   </form>
@@ -221,13 +222,14 @@ if (isset($_POST['more_detail'])) {
                            <span class="ms-2"><i class="fa-solid fa-building"></i> <?php echo htmlspecialchars($fetch_products['publisher_name']); ?></span>
                         </div>
                         <div class="mb-2 text-danger fs-5 fw-bold">$<?php echo number_format($fetch_products['price'], 0, ',', '.'); ?></div>
-                        <div class="mt-auto">
-                           <input type="hidden" min="1" name="product_quantity" value="1" class="form-control mb-2" style="max-width:120px;">
-                           <input type="hidden" name="product_id" value="<?php echo $fetch_products['id']; ?>">
-                           <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($fetch_products['book_name']); ?>">
-                           <input type="hidden" name="product_price" value="<?php echo $fetch_products['price']; ?>">
-                           <input type="hidden" name="product_image" value="<?php echo $fetch_products['image']; ?>">
-                           <button type="submit" name="add_to_cart" class="btn btn-primary w-100">Add to cart</button>
+                        <input type="hidden" name="product_id" value="<?php echo $fetch_products['id']; ?>">
+                        <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($fetch_products['book_name']); ?>">
+                        <input type="hidden" name="product_price" value="<?php echo $fetch_products['price']; ?>">
+                        <input type="hidden" name="product_image" value="<?php echo $fetch_products['image']; ?>">
+                        <input type="hidden" name="product_quantity" value="1">
+                        <div class="mt-auto d-flex gap-2">
+                           <button type="submit" name="add_to_cart" class="btn btn-primary w-50">Add to cart</button>
+                           <button type="submit" name="buy_now" formaction="checkout.php" formmethod="post" class="btn btn-success w-50">Buy now</button>
                         </div>
                      </div>
                   </form>

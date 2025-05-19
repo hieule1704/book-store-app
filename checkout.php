@@ -6,6 +6,23 @@ session_start();
 
 $user_id = $_SESSION['user_id'];
 
+// Detect "Buy now" product
+$buy_now_product = null;
+if (
+   isset($_POST['buy_now']) &&
+   isset($_POST['product_id']) &&
+   isset($_POST['product_name']) &&
+   isset($_POST['product_price']) &&
+   isset($_POST['product_image'])
+) {
+   $buy_now_product = [
+      'id' => $_POST['product_id'],
+      'name' => $_POST['product_name'],
+      'price' => $_POST['product_price'],
+      'image' => $_POST['product_image'],
+      'quantity' => isset($_POST['product_quantity']) ? $_POST['product_quantity'] : 1
+   ];
+}
 
 if (!isset($user_id)) {
    header('location:login.php');
@@ -22,14 +39,19 @@ if (isset($_POST['order_btn'])) {
    $placed_on = date('d-M-Y');
 
    $cart_total = 0;
-   $cart_products[] = '';
+   $cart_products = [];
 
-   $cart_query = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
-   if (mysqli_num_rows($cart_query) > 0) {
-      while ($cart_item = mysqli_fetch_assoc($cart_query)) {
-         $cart_products[] = $cart_item['name'] . ' (' . $cart_item['quantity'] . ') ';
-         $sub_total = ($cart_item['price'] * $cart_item['quantity']);
-         $cart_total += $sub_total;
+   if ($buy_now_product) {
+      $cart_products[] = $buy_now_product['name'] . ' (' . $buy_now_product['quantity'] . ') ';
+      $cart_total = $buy_now_product['price'] * $buy_now_product['quantity'];
+   } else {
+      $cart_query = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
+      if (mysqli_num_rows($cart_query) > 0) {
+         while ($cart_item = mysqli_fetch_assoc($cart_query)) {
+            $cart_products[] = $cart_item['name'] . ' (' . $cart_item['quantity'] . ') ';
+            $sub_total = ($cart_item['price'] * $cart_item['quantity']);
+            $cart_total += $sub_total;
+         }
       }
    }
 
@@ -46,7 +68,9 @@ if (isset($_POST['order_btn'])) {
       } else {
          mysqli_query($conn, "INSERT INTO `orders`(user_id, name, number, email, method, address, total_products, total_price, placed_on) VALUES('$user_id', '$name', '$number', '$email', '$method', '$address', '$total_products', '$cart_total', '$placed_on')") or die('query failed');
          $message[] = 'order placed successfully!';
-         mysqli_query($conn, "DELETE FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
+         if (!$buy_now_product) {
+            mysqli_query($conn, "DELETE FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
+         }
       }
    }
 }
@@ -95,20 +119,31 @@ if (isset($_POST['order_btn'])) {
                <div class="card-body">
                   <?php
                   $grand_total = 0;
-                  $select_cart = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
-                  if (mysqli_num_rows($select_cart) > 0) {
-                     while ($fetch_cart = mysqli_fetch_assoc($select_cart)) {
-                        $total_price = ($fetch_cart['price'] * $fetch_cart['quantity']);
-                        $grand_total += $total_price;
+                  if ($buy_now_product) {
+                     $total_price = $buy_now_product['price'] * $buy_now_product['quantity'];
+                     $grand_total += $total_price;
                   ?>
-                        <div class="d-flex justify-content-between border-bottom py-2">
-                           <span><?php echo $fetch_cart['name']; ?></span>
-                           <span class="text-secondary">(<?php echo '$' . $fetch_cart['price'] . ' x ' . $fetch_cart['quantity']; ?>)</span>
-                        </div>
-                  <?php
-                     }
+                     <div class="d-flex justify-content-between border-bottom py-2">
+                        <span><?php echo htmlspecialchars($buy_now_product['name']); ?></span>
+                        <span class="text-secondary">(<?php echo '$' . $buy_now_product['price'] . ' x ' . $buy_now_product['quantity']; ?>)</span>
+                     </div>
+                     <?php
                   } else {
-                     echo '<div class="alert alert-info text-center my-3">Your cart is empty</div>';
+                     $select_cart = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
+                     if (mysqli_num_rows($select_cart) > 0) {
+                        while ($fetch_cart = mysqli_fetch_assoc($select_cart)) {
+                           $total_price = ($fetch_cart['price'] * $fetch_cart['quantity']);
+                           $grand_total += $total_price;
+                     ?>
+                           <div class="d-flex justify-content-between border-bottom py-2">
+                              <span><?php echo $fetch_cart['name']; ?></span>
+                              <span class="text-secondary">(<?php echo '$' . $fetch_cart['price'] . ' x ' . $fetch_cart['quantity']; ?>)</span>
+                           </div>
+                  <?php
+                        }
+                     } else {
+                        echo '<div class="alert alert-info text-center my-3">Your cart is empty</div>';
+                     }
                   }
                   ?>
                </div>
@@ -124,6 +159,14 @@ if (isset($_POST['order_btn'])) {
                </div>
                <div class="card-body">
                   <form action="" method="post">
+                     <?php if ($buy_now_product): ?>
+                        <input type="hidden" name="buy_now" value="1">
+                        <input type="hidden" name="product_id" value="<?php echo htmlspecialchars($buy_now_product['id']); ?>">
+                        <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($buy_now_product['name']); ?>">
+                        <input type="hidden" name="product_price" value="<?php echo htmlspecialchars($buy_now_product['price']); ?>">
+                        <input type="hidden" name="product_image" value="<?php echo htmlspecialchars($buy_now_product['image']); ?>">
+                        <input type="hidden" name="product_quantity" value="<?php echo htmlspecialchars($buy_now_product['quantity']); ?>">
+                     <?php endif; ?>
                      <div class="row g-3">
                         <div class="col-md-6">
                            <label class="form-label">Your name</label>
