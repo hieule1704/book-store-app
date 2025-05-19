@@ -88,12 +88,7 @@ if (isset($_POST['submit'])) {
                <div class="mb-3">
                   <input type="password" name="cpassword" placeholder="Confirm your password" required class="form-control">
                </div>
-               <div class="mb-3">
-                  <select name="user_type" class="form-select">
-                     <option value="user">User</option>
-                     <option value="admin">Admin</option>
-                  </select>
-               </div>
+               <!-- User type is always 'user', so no select field is shown -->
                <div class="d-grid mb-3">
                   <input type="submit" name="submit" value="Register now" class="btn btn-primary">
                </div>
