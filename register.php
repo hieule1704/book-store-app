@@ -53,13 +53,13 @@ if (isset($_POST['submit'])) {
 </head>
 
 <body class="bg-light">
-<body class="bg-light">
 
-   <?php
-   if (isset($message)) {
-      foreach ($message as $msg) {
-      foreach ($message as $msg) {
-         echo '
+   <body class="bg-light">
+
+      <?php
+      if (isset($message)) {
+         foreach ($message as $msg) {
+            echo '
       <div class="alert alert-warning alert-dismissible fade show position-absolute top-0 start-50 translate-middle-x mt-3" role="alert" style="z-index:1050; min-width:300px;">
          <span>' . $msg . '</span>
          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -68,44 +68,42 @@ if (isset($_POST['submit'])) {
          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
       ';
+         }
       }
-   }
-   ?>
+      ?>
 
-   <div class="container d-flex align-items-center justify-content-center min-vh-100">
-      <div class="card shadow p-4" style="max-width: 400px; width: 100%;">
-         <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
-            <h3 class="mb-4 text-center text-uppercase">Register now</h3>
-            <div class="mb-3">
-               <input type="text" name="name" placeholder="Enter your name" required class="form-control">
-            </div>
-            <div class="mb-3">
-               <input type="email" name="email" placeholder="Enter your email" required class="form-control">
-            </div>
-            <div class="mb-3">
-               <input type="password" name="password" placeholder="Enter your password" required class="form-control">
-            </div>
-            <div class="mb-3">
-               <input type="password" name="cpassword" placeholder="Confirm your password" required class="form-control">
-            </div>
-            <div class="mb-3">
-               <select name="user_type" class="form-select">
-                  <option value="user">User</option>
-                  <option value="admin">Admin</option>
-               </select>
-            </div>
-            <div class="d-grid mb-3">
-               <input type="submit" name="submit" value="Register now" class="btn btn-primary">
-            </div>
-            <p class="text-center mb-0">Already have an account? <a href="login.php">Login now</a></p>
-         </form>
+      <div class="container d-flex align-items-center justify-content-center min-vh-100">
+         <div class="card shadow p-4" style="max-width: 400px; width: 100%;">
+            <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
+               <h3 class="mb-4 text-center text-uppercase">Register now</h3>
+               <div class="mb-3">
+                  <input type="text" name="name" placeholder="Enter your name" required class="form-control">
+               </div>
+               <div class="mb-3">
+                  <input type="email" name="email" placeholder="Enter your email" required class="form-control">
+               </div>
+               <div class="mb-3">
+                  <input type="password" name="password" placeholder="Enter your password" required class="form-control">
+               </div>
+               <div class="mb-3">
+                  <input type="password" name="cpassword" placeholder="Confirm your password" required class="form-control">
+               </div>
+               <div class="mb-3">
+                  <select name="user_type" class="form-select">
+                     <option value="user">User</option>
+                     <option value="admin">Admin</option>
+                  </select>
+               </div>
+               <div class="d-grid mb-3">
+                  <input type="submit" name="submit" value="Register now" class="btn btn-primary">
+               </div>
+               <p class="text-center mb-0">Already have an account? <a href="login.php">Login now</a></p>
+            </form>
+         </div>
       </div>
-   </div>
 
-   <!-- Bootstrap 5.3.x JS Bundle -->
-   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-   <!-- Bootstrap 5.3.x JS Bundle -->
-   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+      <!-- Bootstrap 5.3.x JS Bundle -->
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+   </body>
 
 </html>
