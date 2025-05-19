@@ -131,7 +131,7 @@ if (isset($_POST['order_btn'])) {
                         </div>
                         <div class="col-md-6">
                            <label class="form-label">Your number</label>
-                           <input type="number" name="number" required placeholder="Enter your number" class="form-control">
+                           <input type="text" name="number" required placeholder="Enter your number" class="form-control">
                         </div>
                         <div class="col-md-6">
                            <label class="form-label">Your email</label>

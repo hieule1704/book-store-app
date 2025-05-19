@@ -10,6 +10,28 @@ if (!isset($user_id)) {
    header('location:login.php');
 }
 
+// --- FILTER HANDLING ---
+$search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
+$filter_author = isset($_GET['author']) ? intval($_GET['author']) : 0;
+$filter_publisher = isset($_GET['publisher']) ? intval($_GET['publisher']) : 0;
+
+// --- GET AUTHORS & PUBLISHERS FOR RIBBON ---
+$authors = mysqli_query($conn, "SELECT id, author_name, profile_picture FROM `author`") or die('Failed to fetch authors');
+$publishers = mysqli_query($conn, "SELECT id, publisher_name, profile_image FROM `publisher`") or die('Failed to fetch publishers');
+
+// --- FILTER FORM HANDLING ---
+$where = [];
+if ($search) {
+   $where[] = "(p.book_name LIKE '%$search%')";
+}
+if ($filter_author) {
+   $where[] = "p.author_id = $filter_author";
+}
+if ($filter_publisher) {
+   $where[] = "p.publisher_id = $filter_publisher";
+}
+$where_sql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+
 if (isset($_POST['add_to_cart'])) {
 
    $product_id = $_POST['product_id'];
@@ -72,13 +94,111 @@ if (isset($_POST['more_detail'])) {
       </div>
    </div>
 
+   <!-- SEARCH & FILTER FORM -->
+   <section class="container mb-4">
+      <form class="row g-2 align-items-end sticky-top bg-white py-2" method="get" action="" style="z-index:10;">
+         <div class="col-md-4">
+            <label class="form-label mb-1">Search book</label>
+            <input type="text" name="search" class="form-control" placeholder="Book name..." value="<?php echo htmlspecialchars($search); ?>">
+         </div>
+         <div class="col-md-3">
+            <label class="form-label mb-1">Author</label>
+            <select name="author" class="form-select">
+               <option value="0">All authors</option>
+               <?php foreach ($authors as $author): ?>
+                  <option value="<?php echo $author['id']; ?>" <?php if ($filter_author == $author['id']) echo 'selected'; ?>>
+                     <?php echo htmlspecialchars($author['author_name']); ?>
+                  </option>
+               <?php endforeach; ?>
+            </select>
+         </div>
+         <div class="col-md-3">
+            <label class="form-label mb-1">Publisher</label>
+            <select name="publisher" class="form-select">
+               <option value="0">All publishers</option>
+               <?php foreach ($publishers as $publisher): ?>
+                  <option value="<?php echo $publisher['id']; ?>" <?php if ($filter_publisher == $publisher['id']) echo 'selected'; ?>>
+                     <?php echo htmlspecialchars($publisher['publisher_name']); ?>
+                  </option>
+               <?php endforeach; ?>
+            </select>
+         </div>
+         <div class="col-md-2 d-flex gap-2">
+            <button type="submit" class="btn btn-primary w-100">Filter</button>
+            <a href="shop.php" class="btn btn-outline-secondary w-100">Reset</a>
+         </div>
+      </form>
+   </section>
+
+   <!-- Featured Authors Ribbon -->
+   <section class="container mb-4">
+      <h5 class="mb-2 fw-bold text-center">Featured Authors</h5>
+      <div id="authorRibbon" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3500">
+         <div class="carousel-inner">
+            <?php
+            $i = 0;
+            foreach ($authors as $author):
+            ?>
+               <div class="carousel-item <?php if ($i++ == 0) echo 'active'; ?>">
+                  <div class="d-flex justify-content-center align-items-center" style="height: 220px;">
+                     <a href="shop.php?author=<?php echo $author['id']; ?>" class="d-flex flex-column align-items-center text-decoration-none">
+                        <div class="rounded-circle overflow-hidden mb-2" style="width:180px; height:180px; border:4px solid #0d6efd; background:#fff;">
+                           <img src="uploaded_img/<?php echo htmlspecialchars($author['profile_picture']); ?>" alt="<?php echo htmlspecialchars($author['author_name']); ?>" style="width:100%; height:100%; object-fit:contain; background:#fff;">
+                        </div>
+                        <span class="fw-semibold text-dark text-center" style="max-width:140px; white-space:normal;"><?php echo htmlspecialchars($author['author_name']); ?></span>
+                     </a>
+                  </div>
+               </div>
+            <?php endforeach; ?>
+         </div>
+         <button class="carousel-control-prev" type="button" data-bs-target="#authorRibbon" data-bs-slide="prev" style="filter: invert(1); background: rgba(0,0,0,0.5); border-radius: 50%; width: 48px; height: 48px;">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+         </button>
+         <button class="carousel-control-next" type="button" data-bs-target="#authorRibbon" data-bs-slide="next" style="filter: invert(1); background: rgba(0,0,0,0.5); border-radius: 50%; width: 48px; height: 48px;">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+         </button>
+      </div>
+   </section>
+
+   <!-- Featured Publishers Ribbon -->
+   <section class="container mb-4">
+      <h5 class="mb-2 fw-bold text-center">Publishers</h5>
+      <div id="publisherRibbon" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3500">
+         <div class="carousel-inner">
+            <?php
+            $i = 0;
+            foreach ($publishers as $publisher):
+            ?>
+               <div class="carousel-item <?php if ($i++ == 0) echo 'active'; ?>">
+                  <div class="d-flex justify-content-center align-items-center" style="height: 220px;">
+                     <a href="shop.php?publisher=<?php echo $publisher['id']; ?>" class="d-flex flex-column align-items-center text-decoration-none">
+                        <div class="rounded-circle overflow-hidden mb-2" style="width:180px; height:180px; border:4px solid #ffc107; background:#fff;">
+                           <img src="uploaded_img/<?php echo htmlspecialchars($publisher['profile_image']); ?>" alt="<?php echo htmlspecialchars($publisher['publisher_name']); ?>" style="width:100%; height:100%; object-fit:contain; background:#fff;">
+                        </div>
+                        <span class="fw-semibold text-dark text-center" style="max-width:140px; white-space:normal;"><?php echo htmlspecialchars($publisher['publisher_name']); ?></span>
+                     </a>
+                  </div>
+               </div>
+            <?php endforeach; ?>
+         </div>
+         <button class="carousel-control-prev" type="button" data-bs-target="#publisherRibbon" data-bs-slide="prev" style="filter: invert(1); background: rgba(0,0,0,0.5); border-radius: 50%; width: 48px; height: 48px;">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+         </button>
+         <button class="carousel-control-next" type="button" data-bs-target="#publisherRibbon" data-bs-slide="next" style="filter: invert(1); background: rgba(0,0,0,0.5); border-radius: 50%; width: 48px; height: 48px;">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+         </button>
+      </div>
+   </section>
+
    <section class="container py-5">
       <h1 class="text-center text-uppercase mb-4">Latest Books</h1>
       <div class="row g-4">
          <?php
          $select_products = mysqli_query($conn, "SELECT p.*, a.author_name, pub.publisher_name FROM `products` p
             LEFT JOIN `author` a ON p.author_id = a.id
-            LEFT JOIN `publisher` pub ON p.publisher_id = pub.id") or die('query failed');
+            LEFT JOIN `publisher` pub ON p.publisher_id = pub.id
+            $where_sql
+         ") or die('query failed');
 
          if (mysqli_num_rows($select_products) > 0) {
             while ($fetch_products = mysqli_fetch_assoc($select_products)) {
@@ -109,7 +229,7 @@ if (isset($_POST['more_detail'])) {
          <?php
             }
          } else {
-            echo '<div class="col-12"><div class="alert alert-info text-center">No books added yet!</div></div>';
+            echo '<div class="col-12"><div class="alert alert-info text-center">No books found!</div></div>';
          }
          ?>
       </div>
