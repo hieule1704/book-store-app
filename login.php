@@ -87,6 +87,9 @@ if (isset($_POST['submit'])) {
                <div class="d-grid mb-3">
                   <input type="submit" name="submit" value="Login now" class="btn btn-primary">
                </div>
+               <div class="d-grid mb-3">
+                  <a href="google_login.php" class="btn btn-danger"><i class="fab fa-google me-2"></i> Login with Google</a>
+               </div>
                <p class="text-center mb-0">Don't have an account? <a href="register.php">Register now</a></p>
             </form>
          </div>

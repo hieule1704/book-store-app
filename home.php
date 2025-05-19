@@ -147,87 +147,6 @@ if (isset($_POST['more_detail'])) {
          </div>
       </div>
    </section>
-   <!-- Hero Section -->
-   <section class="bg-light py-5">
-      <div class="container">
-         <div class="row align-items-center">
-            <div class="col-lg-7">
-               <h3 class="display-5 fw-bold mb-3">Hand Picked Book to your door.</h3>
-               <p class="lead mb-4">Discover a curated selection of books delivered straight to your door. From timeless classics to modern must-reads, we bring the joy of reading to you.</p>
-               <a href="about.php" class="btn btn-primary btn-lg">Discover more</a>
-            </div>
-            <div class="col-lg-5 d-none d-lg-block">
-               <img src="images/about-img.jpg" alt="Books" class="img-fluid rounded shadow">
-            </div>
-         </div>
-      </div>
-   </section>
-
-   <!-- Featured Book Ribbon Carousel (Images Only) -->
-   <section class="py-4" style="width:100vw; max-width:100vw; margin-left:calc(-50vw + 50%); background: #f8f9fa;">
-      <div class="container-fluid px-0">
-         <div id="bookRibbonCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
-            <div class="carousel-inner">
-               <div class="carousel-item active">
-                  <div class="d-flex justify-content-center align-items-center" style="height: 480px;">
-                     <img src="other_resource/ribbon1.jpg" class="rounded-4 shadow-lg border border-4 border-primary"
-                        style="height:440px; width:90vw; max-width:1600px; object-fit:cover; background:#fff;" alt="Featured Book 1">
-                  </div>
-               </div>
-               <div class="carousel-item">
-                  <div class="d-flex justify-content-center align-items-center" style="height: 480px;">
-                     <img src="other_resource/ribbon2.jpg" class="rounded-4 shadow-lg border border-4 border-warning"
-                        style="height:440px; width:90vw; max-width:1600px; object-fit:cover; background:#fff;" alt="Featured Book 2">
-                  </div>
-               </div>
-               <div class="carousel-item">
-                  <div class="d-flex justify-content-center align-items-center" style="height: 480px;">
-                     <img src="other_resource/ribbon3.jpg" class="rounded-4 shadow-lg border border-4 border-success"
-                        style="height:440px; width:90vw; max-width:1600px; object-fit:cover; background:#fff;" alt="Featured Book 3">
-                  </div>
-               </div>
-               <div class="carousel-item">
-                  <div class="d-flex justify-content-center align-items-center" style="height: 480px;">
-                     <img src="other_resource/ribbon4.jpg" class="rounded-4 shadow-lg border border-4 border-danger"
-                        style="height:440px; width:90vw; max-width:1600px; object-fit:cover; background:#fff;" alt="Featured Book 4">
-                  </div>
-               </div>
-               <div class="carousel-item">
-                  <div class="d-flex justify-content-center align-items-center" style="height: 480px;">
-                     <img src="other_resource/ribbon5.jpg" class="rounded-4 shadow-lg border border-4 border-info"
-                        style="height:440px; width:90vw; max-width:1600px; object-fit:cover; background:#fff;" alt="Featured Book 5">
-                  </div>
-               </div>
-               <div class="carousel-item">
-                  <div class="d-flex justify-content-center align-items-center" style="height: 480px;">
-                     <img src="other_resource/ribbon6.jpg" class="rounded-4 shadow-lg border border-4 border-primary"
-                        style="height:440px; width:90vw; max-width:1600px; object-fit:cover; background:#fff;" alt="Featured Book 6">
-                  </div>
-               </div>
-               <div class="carousel-item">
-                  <div class="d-flex justify-content-center align-items-center" style="height: 480px;">
-                     <img src="other_resource/ribbon7.jpg" class="rounded-4 shadow-lg border border-4 border-warning"
-                        style="height:440px; width:90vw; max-width:1600px; object-fit:cover; background:#fff;" alt="Featured Book 7">
-                  </div>
-               </div>
-               <div class="carousel-item">
-                  <div class="d-flex justify-content-center align-items-center" style="height: 480px;">
-                     <img src="other_resource/ribbon8.jpg" class="rounded-4 shadow-lg border border-4 border-success"
-                        style="height:440px; width:90vw; max-width:1600px; object-fit:cover; background:#fff;" alt="Featured Book 8">
-                  </div>
-               </div>
-            </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#bookRibbonCarousel" data-bs-slide="prev">
-               <span class="carousel-control-prev-icon bg-primary rounded-circle" aria-hidden="true"></span>
-               <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#bookRibbonCarousel" data-bs-slide="next">
-               <span class="carousel-control-next-icon bg-primary rounded-circle" aria-hidden="true"></span>
-               <span class="visually-hidden">Next</span>
-            </button>
-         </div>
-      </div>
-   </section>
 
    <!-- Latest Products Section -->
    <section class="container py-5">
@@ -323,25 +242,7 @@ if (isset($_POST['more_detail'])) {
       </div>
       <div class="text-center mt-4">
          <a href="shop.php" class="btn btn-warning">Load more</a>
-         <div class="text-center mt-4">
-            <a href="shop.php" class="btn btn-warning">Load more</a>
-         </div>
-   </section>
-
-   <!-- About Section -->
-   <section class="container py-5">
-      <div class="row align-items-center">
-         <div class="col-lg-6 mb-4 mb-lg-0">
-            <img src="images/about-img.jpg" alt="" class="img-fluid rounded shadow">
-         </div>
-         <div class="col-lg-6">
-            <h3 class="fw-bold mb-3">About us</h3>
-            <p>We are a passionate online bookstore dedicated to bringing knowledge and inspiration to readers. Every book is carefully selected to spark curiosity and enrich your reading experience.</p>
-            <p>Join us on this literary journey and discover the joy of reading. Whether you're a lifelong book lover or just starting your reading adventure, we have something special for you.</p>
-            <a href="about.php" class="btn btn-primary">Read more</a>
-         </div>
       </div>
-   </section>
    </section>
 
    <!-- About Section -->
@@ -371,24 +272,9 @@ if (isset($_POST['more_detail'])) {
          </div>
       </div>
    </section>
-   <!-- Contact Section -->
-   <section class="bg-light py-5">
-      <div class="container">
-         <div class="row justify-content-center">
-            <div class="col-lg-8 text-center">
-               <h3 class="fw-bold mb-3">Have any questions?</h3>
-               <p class="mb-4">We're here to help! If you have any questions about our books, your order, or anything else, feel free to reach out to us anytime.</p>
-               <a href="contact.php" class="btn btn-outline-primary btn-lg">Contact us</a>
-            </div>
-         </div>
-      </div>
-   </section>
 
    <?php include 'footer.php'; ?>
-   <?php include 'footer.php'; ?>
 
-   <!-- Bootstrap 5.3.x JS Bundle -->
-   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
    <!-- Bootstrap 5.3.x JS Bundle -->
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
