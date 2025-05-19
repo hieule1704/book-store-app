@@ -46,20 +46,29 @@ if (isset($_POST['submit'])) {
    <!-- Bootstrap 5.3.x CSS -->
    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
+   <!-- Bootstrap 5.3.x CSS -->
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
    <!-- custom css file link  -->
    <!-- <link rel="stylesheet" href="css/style.css"> -->
+   <!-- <link rel="stylesheet" href="css/style.css"> -->
 
 </head>
 
+<body class="bg-light">
 <body class="bg-light">
 
    <?php
    if (isset($message)) {
       foreach ($message as $msg) {
+      foreach ($message as $msg) {
          echo '
+      <div class="alert alert-danger alert-dismissible fade show position-absolute top-0 start-50 translate-middle-x mt-3" role="alert" style="z-index:1050; min-width:300px;">
+         <span>' . $msg . '</span>
+         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       <div class="alert alert-danger alert-dismissible fade show position-absolute top-0 start-50 translate-middle-x mt-3" role="alert" style="z-index:1050; min-width:300px;">
          <span>' . $msg . '</span>
          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -87,6 +96,8 @@ if (isset($_POST['submit'])) {
       </div>
    </div>
 
+   <!-- Bootstrap 5.3.x JS Bundle -->
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
    <!-- Bootstrap 5.3.x JS Bundle -->
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

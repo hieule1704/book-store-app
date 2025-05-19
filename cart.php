@@ -7,9 +7,11 @@ session_start();
 $user_id = $_SESSION['user_id'];
 
 if (!isset($user_id)) {
+if (!isset($user_id)) {
    header('location:login.php');
 }
 
+if (isset($_POST['update_cart'])) {
 if (isset($_POST['update_cart'])) {
    $cart_id = $_POST['cart_id'];
    $cart_quantity = $_POST['cart_quantity'];
@@ -18,11 +20,13 @@ if (isset($_POST['update_cart'])) {
 }
 
 if (isset($_GET['delete'])) {
+if (isset($_GET['delete'])) {
    $delete_id = $_GET['delete'];
    mysqli_query($conn, "DELETE FROM `cart` WHERE id = '$delete_id'") or die('query failed');
    header('location:cart.php');
 }
 
+if (isset($_GET['delete_all'])) {
 if (isset($_GET['delete_all'])) {
    mysqli_query($conn, "DELETE FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
    header('location:cart.php');
@@ -33,10 +37,15 @@ if (isset($_GET['delete_all'])) {
 <!DOCTYPE html>
 <html lang="en">
 
+
 <head>
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Cart</title>
+
+   <!-- Bootstrap 5.3.x CSS -->
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
    <title>Cart</title>
 
    <!-- Bootstrap 5.3.x CSS -->
@@ -46,9 +55,13 @@ if (isset($_GET['delete_all'])) {
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
    <link rel="stylesheet" href="style.css">
+   <link rel="stylesheet" href="style.css">
 </head>
 
+
 <body>
+
+   <?php include 'header.php'; ?>
 
    <?php include 'header.php'; ?>
 
@@ -63,7 +76,22 @@ if (isset($_GET['delete_all'])) {
          </nav>
       </div>
    </div>
+   <div class="bg-light py-4 mb-4">
+      <div class="container">
+         <h3 class="mb-1">Shopping cart</h3>
+         <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+               <li class="breadcrumb-item"><a href="home.php">Home</a></li>
+               <li class="breadcrumb-item active" aria-current="page">Cart</li>
+            </ol>
+         </nav>
+      </div>
+   </div>
 
+   <section class="container py-5">
+      <h1 class="text-center text-uppercase mb-4">Products added</h1>
+      <div class="row g-4">
+         <?php
    <section class="container py-5">
       <h1 class="text-center text-uppercase mb-4">Products added</h1>
       <div class="row g-4">
@@ -128,10 +156,14 @@ if (isset($_GET['delete_all'])) {
 
 
    <?php include 'footer.php'; ?>
+   <?php include 'footer.php'; ?>
 
+   <!-- Bootstrap 5.3.x JS Bundle -->
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
    <!-- Bootstrap 5.3.x JS Bundle -->
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
+
 
 </html>
