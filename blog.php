@@ -60,7 +60,7 @@ if (!isset($user_id)) {
                             <?php endif; ?>
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title"><?php echo htmlspecialchars($blog['title']); ?></h5>
-                                <p class="card-text"><?php echo nl2br(htmlspecialchars(substr($blog['content'], 0, 150))); ?>...</p>
+                                <p class="card-text"><?php echo nl2br(htmlspecialchars(substr(strip_tags($blog['content']), 0, 150))); ?>...</p>
                                 <div class="mt-auto">
                                     <a href="blog_detail.php?id=<?php echo $blog['id']; ?>" class="btn btn-primary btn-sm">Read More</a>
                                 </div>

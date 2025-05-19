@@ -23,14 +23,18 @@ if (isset($_POST['add_blog'])) {
     $image_tmp = $_FILES['image']['tmp_name'];
     $image_folder = 'uploaded_img/' . $image;
 
-    $add_blog = mysqli_query($conn, "INSERT INTO `blogs`(title, content, image, author_id) VALUES('$title', '$content', '$image', '$author_id')") or die('query failed');
-    if ($add_blog) {
-        if (!empty($image)) {
-            move_uploaded_file($image_tmp, $image_folder);
+    if (!isset($content)) {
+        $add_blog = mysqli_query($conn, "INSERT INTO `blogs`(title, content, image, author_id) VALUES('$title', '$content', '$image', '$author_id')") or die('query failed');
+        if ($add_blog) {
+            if (!empty($image)) {
+                move_uploaded_file($image_tmp, $image_folder);
+            }
+            $message[] = 'Blog added successfully!';
+        } else {
+            $message[] = 'Failed to add blog!';
         }
-        $message[] = 'Blog added successfully!';
     } else {
-        $message[] = 'Failed to add blog!';
+        $message[] = 'Content is null!';
     }
 }
 
@@ -81,6 +85,8 @@ if (isset($_POST['update_blog'])) {
     <title>Blogs</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
 </head>
 
 <body class="bg-light">
@@ -107,7 +113,7 @@ if (isset($_POST['update_blog'])) {
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <textarea name="content" class="form-control" rows="5" placeholder="Enter blog content" required></textarea>
+                                <textarea id="editor" name="content" class="form-control" rows="5" placeholder="Enter blog content"></textarea>
                             </div>
                             <div class="mb-3">
                                 <input type="file" name="image" accept="image/jpg, image/jpeg, image/png" class="form-control">
@@ -137,7 +143,7 @@ if (isset($_POST['update_blog'])) {
                             <div class="card-body">
                                 <h5 class="card-title"><?php echo htmlspecialchars($blog['title']); ?></h5>
                                 <p class="mb-1"><strong>Author:</strong> <?php echo htmlspecialchars($blog['author_name']); ?></p>
-                                <p class="card-text" style="max-height: 80px; overflow: hidden;"><?php echo nl2br(htmlspecialchars(mb_substr($blog['content'], 0, 100))); ?>...</p>
+                                <p class="card-text" style="max-height: 80px; overflow: hidden;"><?php echo nl2br(htmlspecialchars(mb_substr(strip_tags($blog['content']), 0, 100))); ?>...</p>
                                 <a href="admin_blogs.php?update=<?php echo $blog['id']; ?>" class="btn btn-warning me-2">Update</a>
                                 <a href="admin_blogs.php?delete=<?php echo $blog['id']; ?>" class="btn btn-danger" onclick="return confirm('Delete this blog?');">Delete</a>
                             </div>
@@ -161,7 +167,7 @@ if (isset($_POST['update_blog'])) {
             $authors_modal = mysqli_query($conn, "SELECT id, author_name FROM `author`") or die('Failed to fetch authors');
     ?>
             <div class="modal fade show" id="editBlogModal" tabindex="-1" aria-modal="true" style="display:block; background:rgba(0,0,0,0.5);">
-                <div class="modal-dialog">
+                <div class="modal-dialog modal-xl">
                     <div class="modal-content">
                         <form action="" method="post" enctype="multipart/form-data">
                             <div class="modal-header">
@@ -190,7 +196,7 @@ if (isset($_POST['update_blog'])) {
                                     </select>
                                 </div>
                                 <div class="mb-3">
-                                    <textarea name="update_content" class="form-control" rows="5" required><?php echo htmlspecialchars($fetch_update['content']); ?></textarea>
+                                    <textarea id="editorUpdate" name="update_content" class="form-control" rows="5" required><?php echo htmlspecialchars($fetch_update['content']); ?></textarea>
                                 </div>
                                 <div class="mb-3">
                                     <input type="file" class="form-control" name="update_image" accept="image/jpg, image/jpeg, image/png">
@@ -220,5 +226,27 @@ if (isset($_POST['update_blog'])) {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
+<script>
+    // Add blog
+    ClassicEditor
+        .create(document.querySelector('#editor'))
+        .catch(error => {
+            console.error(error);
+        });
+
+    // Edit blog
+    const editorUpdate = document.querySelector('#editorUpdate');
+    if (editorUpdate) {
+        ClassicEditor
+            .create(editorUpdate)
+            .catch(error => {
+                console.error(error);
+            });
+    }
+</script>
+
+</body>
+
 
 </html>

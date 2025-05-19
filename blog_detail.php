@@ -36,7 +36,15 @@ $blog = $result->fetch_assoc();
     <title>Blog Detail</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
+    <style>
+        .card-text img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 10px auto;
+        }
+    </style>
+
 
 <body>
 
@@ -49,7 +57,7 @@ $blog = $result->fetch_assoc();
                 <ol class="breadcrumb mb-0">
                     <li class="breadcrumb-item"><a href="home.php">Home</a></li>
                     <li class="breadcrumb-item"><a href="blog.php">Blog</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Detail</li>
+                    <li class="breadcrumb-item active" aria-current="page"><?php echo htmlspecialchars($blog['title']); ?></li>
                 </ol>
             </nav>
         </div>
@@ -69,7 +77,7 @@ $blog = $result->fetch_assoc();
                                 Posted on <?php echo date('M d, Y', strtotime($blog['created_at'])); ?>
                             </p>
                             <div class="card-text">
-                                <?php echo nl2br(htmlspecialchars($blog['content'])); ?>
+                                <?php echo $blog['content']; ?>
                             </div>
                         </div>
                     </div>
