@@ -10,9 +10,11 @@ if (!isset($admin_id)) {
    header('location:login.php');
 }
 
-// Fetch authors and publishers for dropdowns
-$authors = mysqli_query($conn, "SELECT id, author_name FROM `author`") or die('Failed to fetch authors');
-$publishers = mysqli_query($conn, "SELECT id, publisher_name FROM `publisher`") or die('Failed to fetch publishers');
+// Fetch authors and publishers for dropdowns (for both add and filter forms)
+$authors_all = mysqli_query($conn, "SELECT id, author_name FROM `author` ORDER BY author_name ASC") or die('Failed to fetch authors');
+$publishers_all = mysqli_query($conn, "SELECT id, publisher_name FROM `publisher` ORDER BY publisher_name ASC") or die('Failed to fetch publishers');
+
+// --- Handle product add/delete/update (existing logic) ---
 
 if (isset($_POST['add_product'])) {
 
@@ -91,6 +93,30 @@ if (isset($_POST['update_product'])) {
    header('location:admin_products.php');
 }
 
+// --- Filtering Logic ---
+$filter_book_name = isset($_GET['filter_book_name']) ? mysqli_real_escape_string($conn, $_GET['filter_book_name']) : '';
+$filter_author_id = isset($_GET['filter_author_id']) ? intval($_GET['filter_author_id']) : '';
+$filter_publisher_id = isset($_GET['filter_publisher_id']) ? intval($_GET['filter_publisher_id']) : '';
+
+$filter_sql_parts = [];
+if (!empty($filter_book_name)) {
+   $filter_sql_parts[] = "p.book_name LIKE '%$filter_book_name%'";
+}
+if (!empty($filter_author_id)) {
+   $filter_sql_parts[] = "p.author_id = '$filter_author_id'";
+}
+if (!empty($filter_publisher_id)) {
+   $filter_sql_parts[] = "p.publisher_id = '$filter_publisher_id'";
+}
+
+$filter_where_clause = '';
+if (!empty($filter_sql_parts)) {
+   $filter_where_clause = 'WHERE ' . implode(' AND ', $filter_sql_parts);
+}
+
+mysqli_data_seek($authors_all, 0);
+mysqli_data_seek($publishers_all, 0);
+
 ?>
 
 <!DOCTYPE html>
@@ -100,20 +126,16 @@ if (isset($_POST['update_product'])) {
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>products</title>
+   <title>Products</title>
 
-   <!-- Bootstrap 5.3.x CSS -->
    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-   <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body class="bg-light">
 
    <?php include 'admin_header.php'; ?>
-
-   <!-- product CRUD section starts  -->
 
    <section class="container my-5">
       <h1 class="text-center text-uppercase mb-4">Shop products</h1>
@@ -129,7 +151,11 @@ if (isset($_POST['update_product'])) {
                      <div class="mb-3">
                         <select name="author_id" class="form-select" required>
                            <option value="">Select author</option>
-                           <?php while ($row = mysqli_fetch_assoc($authors)) { ?>
+                           <?php
+                           // Make sure authors_all is usable again for the add form
+                           mysqli_data_seek($authors_all, 0); // Reset pointer
+                           while ($row = mysqli_fetch_assoc($authors_all)) {
+                           ?>
                               <option value="<?php echo $row['id']; ?>"><?php echo htmlspecialchars($row['author_name']); ?></option>
                            <?php } ?>
                         </select>
@@ -137,7 +163,11 @@ if (isset($_POST['update_product'])) {
                      <div class="mb-3">
                         <select name="publisher_id" class="form-select" required>
                            <option value="">Select publisher</option>
-                           <?php while ($row = mysqli_fetch_assoc($publishers)) { ?>
+                           <?php
+                           // Make sure publishers_all is usable again for the add form
+                           mysqli_data_seek($publishers_all, 0); // Reset pointer
+                           while ($row = mysqli_fetch_assoc($publishers_all)) {
+                           ?>
                               <option value="<?php echo $row['id']; ?>"><?php echo htmlspecialchars($row['publisher_name']); ?></option>
                            <?php } ?>
                         </select>
@@ -170,23 +200,68 @@ if (isset($_POST['update_product'])) {
       </div>
    </section>
 
-   <!-- product CRUD section ends -->
-
-   <!-- show products  -->
-
+   <section class="container my-5">
+      <h2 class="text-center text-uppercase mb-4">Filter Products</h2>
+      <div class="row justify-content-center">
+         <div class="col-lg-8">
+            <div class="card shadow mb-4">
+               <div class="card-body">
+                  <form action="" method="get" class="row g-3 align-items-end">
+                     <div class="col-md-4">
+                        <label for="filter_book_name" class="form-label">Book Name</label>
+                        <input type="text" class="form-control" id="filter_book_name" name="filter_book_name" value="<?php echo htmlspecialchars($filter_book_name); ?>" placeholder="Enter book name">
+                     </div>
+                     <div class="col-md-4">
+                        <label for="filter_author_id" class="form-label">Author</label>
+                        <select name="filter_author_id" id="filter_author_id" class="form-select">
+                           <option value="">All Authors</option>
+                           <?php
+                           // Fetch authors for filter dropdown
+                           $authors_filter = mysqli_query($conn, "SELECT id, author_name FROM `author` ORDER BY author_name ASC") or die('Failed to fetch authors');
+                           while ($row = mysqli_fetch_assoc($authors_filter)) {
+                              $selected = ($row['id'] == $filter_author_id) ? 'selected' : '';
+                              echo '<option value="' . $row['id'] . '" ' . $selected . '>' . htmlspecialchars($row['author_name']) . '</option>';
+                           }
+                           ?>
+                        </select>
+                     </div>
+                     <div class="col-md-4">
+                        <label for="filter_publisher_id" class="form-label">Publisher</label>
+                        <select name="filter_publisher_id" id="filter_publisher_id" class="form-select">
+                           <option value="">All Publishers</option>
+                           <?php
+                           // Fetch publishers for filter dropdown
+                           $publishers_filter = mysqli_query($conn, "SELECT id, publisher_name FROM `publisher` ORDER BY publisher_name ASC") or die('Failed to fetch publishers');
+                           while ($row = mysqli_fetch_assoc($publishers_filter)) {
+                              $selected = ($row['id'] == $filter_publisher_id) ? 'selected' : '';
+                              echo '<option value="' . $row['id'] . '" ' . $selected . '>' . htmlspecialchars($row['publisher_name']) . '</option>';
+                           }
+                           ?>
+                        </select>
+                     </div>
+                     <div class="col-12 d-flex justify-content-end">
+                        <button type="submit" class="btn btn-info me-2"><i class="fas fa-filter"></i> Filter</button>
+                        <a href="admin_products.php" class="btn btn-secondary"><i class="fas fa-times"></i> Clear Filter</a>
+                     </div>
+                  </form>
+               </div>
+            </div>
+         </div>
+      </div>
+   </section>
    <section class="container mb-5">
       <div class="row g-4">
          <?php
          $select_products = mysqli_query($conn, "SELECT p.*, a.author_name, pub.publisher_name FROM `products` p
-            LEFT JOIN `author` a ON p.author_id = a.id
-            LEFT JOIN `publisher` pub ON p.publisher_id = pub.id
-            ") or die('query failed');
+                LEFT JOIN `author` a ON p.author_id = a.id
+                LEFT JOIN `publisher` pub ON p.publisher_id = pub.id
+                " . $filter_where_clause . " ORDER BY p.book_name ASC") or die('query failed');
          if (mysqli_num_rows($select_products) > 0) {
             while ($fetch_products = mysqli_fetch_assoc($select_products)) {
          ?>
                <div class="col-md-3 col-sm-6">
                   <div class="card h-100 text-center shadow">
-                     <img src="uploaded_img/<?php echo $fetch_products['image']; ?>" class="card-img-top" alt="">
+                     <img src="uploaded_img/<?php echo $fetch_products['image']; ?>" class="card-img-top" alt="<?php echo htmlspecialchars($fetch_products['book_name']); ?>">
                      <div class="card-body">
                         <h5 class="card-title"><?php echo htmlspecialchars($fetch_products['book_name']); ?></h5>
                         <p class="mb-1"><strong>Author:</strong> <?php echo htmlspecialchars($fetch_products['author_name']); ?></p>
@@ -203,13 +278,12 @@ if (isset($_POST['update_product'])) {
          <?php
             }
          } else {
-            echo '<div class="col-12"><div class="alert alert-info text-center">No products added yet!</div></div>';
+            echo '<div class="col-12"><div class="alert alert-info text-center">No products found matching your criteria!</div></div>';
          }
          ?>
       </div>
    </section>
 
-   <!-- Edit product modal (Bootstrap modal for better UX) -->
    <?php
    if (isset($_GET['update'])) {
       $update_id = $_GET['update'];
@@ -218,8 +292,8 @@ if (isset($_POST['update_product'])) {
          $fetch_update = mysqli_fetch_assoc($update_query);
 
          // Fetch authors and publishers again for dropdowns in modal
-         $authors_modal = mysqli_query($conn, "SELECT id, author_name FROM `author`") or die('Failed to fetch authors');
-         $publishers_modal = mysqli_query($conn, "SELECT id, publisher_name FROM `publisher`") or die('Failed to fetch publishers');
+         $authors_modal = mysqli_query($conn, "SELECT id, author_name FROM `author` ORDER BY author_name ASC") or die('Failed to fetch authors');
+         $publishers_modal = mysqli_query($conn, "SELECT id, publisher_name FROM `publisher` ORDER BY publisher_name ASC") or die('Failed to fetch publishers');
    ?>
          <div class="modal fade show" id="editProductModal" tabindex="-1" aria-modal="true" style="display:block; background:rgba(0,0,0,0.5);">
             <div class="modal-dialog">
@@ -290,7 +364,8 @@ if (isset($_POST['update_product'])) {
             document.body.classList.add('modal-open');
             document.body.style.overflow = 'hidden';
             document.addEventListener('click', function(e) {
-               if (e.target.classList.contains('modal')) {
+               // Check if the click was on the modal backdrop, not inside the modal content
+               if (e.target.classList.contains('modal') && e.target.id === 'editProductModal') {
                   window.location.href = 'admin_products.php';
                }
             });
@@ -300,7 +375,6 @@ if (isset($_POST['update_product'])) {
    }
    ?>
 
-   <!-- Bootstrap 5.3.x JS Bundle -->
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
