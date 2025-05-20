@@ -137,9 +137,11 @@ if (isset($_POST['update_blog'])) {
             ?>
                     <div class="col-md-4 col-sm-6">
                         <div class="card h-100 shadow">
-                            <?php if (!empty($blog['image'])) { ?>
-                                <img src="uploaded_img/<?php echo htmlspecialchars($blog['image']); ?>" class="card-img-top" style="height:180px; object-fit:cover;" alt="">
-                            <?php } ?>
+                            <?php
+                            $defaultImage = "uploaded_img/default_blog_img.jpg";
+                            $imageSrc = !empty($blog['image']) ? "uploaded_img/" . htmlspecialchars($blog['image']) : $defaultImage;
+                            ?>
+                            <img src="<?php echo $imageSrc; ?>" class="card-img-top img-fluid    object-fit-cover" alt="Blog Image" style="height:150px">
                             <div class="card-body">
                                 <h5 class="card-title"><?php echo htmlspecialchars($blog['title']); ?></h5>
                                 <p class="mb-1"><strong>Author:</strong> <?php echo htmlspecialchars($blog['author_name']); ?></p>
