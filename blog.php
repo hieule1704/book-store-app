@@ -55,9 +55,13 @@ if (!isset($user_id)) {
             ?>
                     <div class="col-md-6 col-lg-4">
                         <div class="card shadow h-100">
-                            <?php if (!empty($blog['image'])): ?>
-                                <img src="uploaded_img/<?php echo htmlspecialchars($blog['image']); ?>" class="card-img-top" alt="">
-                            <?php endif; ?>
+                            <?php
+                            $defaultImage = "uploaded_img/default_blog_img.jpg";
+                            $imageSrc = !empty($blog['image']) ? "uploaded_img/" . htmlspecialchars($blog['image']) : $defaultImage;
+                            ?>
+
+                            <img src="<?php echo $imageSrc; ?>" class="card-img-top img-fluid object-fit-cover" alt="Blog Image" style="height:150px">
+
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title"><?php echo htmlspecialchars($blog['title']); ?></h5>
                                 <p class="card-text"><?php echo nl2br(htmlspecialchars(substr(strip_tags($blog['content']), 0, 150))); ?>...</p>
