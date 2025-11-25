@@ -13,66 +13,58 @@ $publishers = $conn->query("SELECT id, publisher_name FROM publisher")->fetch_al
 $type = $_GET['type'] ?? '';
 $value = $_GET['value'] ?? '';
 
-$sql = "SELECT total_products FROM orders WHERE payment_status = 'completed'";
-$result = $conn->query($sql);
+// --- NEW LOGIC USING ORDER_ITEMS TABLE ---
 
-$productCounts = []; // ['Product Name' => quantity]
+// Base SQL parts
+$sql_joins = "
+    FROM order_items oi
+    JOIN orders o ON oi.order_id = o.id
+    JOIN products p ON oi.product_id = p.id
+";
+
+$sql_where = "WHERE o.payment_status = 'completed'";
+
+// Apply Filters
+if ($type == 'author' && $value !== '') {
+    $sql_where .= " AND p.author_id = " . intval($value);
+} elseif ($type == 'publisher' && $value !== '') {
+    $sql_where .= " AND p.publisher_id = " . intval($value);
+}
+
+// 1. Fetch Data for Charts & Tables
+$query = "
+    SELECT 
+        p.book_name, 
+        SUM(oi.quantity) as total_qty, 
+        SUM(oi.quantity * oi.price) as total_revenue,
+        p.price as current_price
+    $sql_joins
+    $sql_where
+    GROUP BY p.id
+    ORDER BY total_revenue DESC
+";
+
+$result = $conn->query($query);
+
+$labels = [];
+$revenueData = [];
+$quantityData = [];
+$priceData = [];
+$totalRevenue = 0;
 
 while ($row = $result->fetch_assoc()) {
-    $items = explode(',', $row['total_products']);
-    foreach ($items as $item) {
-        if (preg_match('/(.*)\s\((\d+)\)/', trim($item), $matches)) {
-            $name = trim($matches[1]);
-            $qty = (int)$matches[2];
-            if (!isset($productCounts[$name])) $productCounts[$name] = 0;
-            $productCounts[$name] += $qty;
-        }
-    }
+    $name = $row['book_name'];
+    $labels[] = $name;
+    $revenueData[] = $row['total_revenue'];
+    $quantityData[$name] = $row['total_qty']; // Key-value for sorting top 5
+    $priceData[] = $row['current_price'];
+    $totalRevenue += $row['total_revenue'];
 }
 
-$filter_id = null;
-if ($type == 'author' && $value !== '') {
-    $authorResult = $conn->query("SELECT id FROM author WHERE id = " . intval($value));
-    $authorRow = $authorResult->fetch_assoc();
-    $filter_id = $authorRow['id'] ?? null;
-} elseif ($type == 'publisher' && $value !== '') {
-    $publisherResult = $conn->query("SELECT id FROM publisher WHERE id = " . intval($value));
-    $publisherRow = $publisherResult->fetch_assoc();
-    $filter_id = $publisherRow['id'] ?? null;
-}
-
-$quantityData = [];
-
-$revenueData = []; // ['product name' => total revenue]
-$filteredQuantityData = [];
-$priceData = [];
-
-foreach ($productCounts as $name => $qty) {
-    $productInfo = $conn->query("SELECT * FROM products WHERE book_name = '" . $conn->real_escape_string($name) . "'")->fetch_assoc();
-    if (!$productInfo) continue;
-
-    $quantityData[$name] = $qty;
-
-    if (($type == 'author' && $productInfo['author_id'] != $filter_id) ||
-        ($type == 'publisher' && $productInfo['publisher_id'] != $filter_id)
-    ) {
-        continue;
-    }
-
-    $revenue = $productInfo['price'] * $qty;
-    $revenueData[$name] = $revenue;
-    $filteredQuantityData[$name] = $qty;
-    $priceData[$name] = $productInfo['price'];
-}
-
-arsort($revenueData);
-$labels = array_keys($revenueData);
-$data = array_values($revenueData);
-$totalRevenue = array_sum($data);
-
+// Top 5 Logic
 arsort($quantityData);
 $top5Labels = array_slice(array_keys($quantityData), 0, 5);
-$top5Quantities = array_slice($quantityData, 0, 5);
+$top5Quantities = array_slice(array_values($quantityData), 0, 5);
 
 ?>
 
@@ -85,10 +77,9 @@ $top5Quantities = array_slice($quantityData, 0, 5);
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
 </head>
 
-<body>
+<body class="bg-light">
     <?php include 'admin_header.php'; ?>
 
     <section class="container my-5">
@@ -133,24 +124,22 @@ $top5Quantities = array_slice($quantityData, 0, 5);
             <p class="text-end mt-3 fw-bold text-primary">Total Revenue: $<?= number_format($totalRevenue) ?></p>
 
             <div class="mt-4">
-                <h5>Quantity Sold:</h5>
-                <table class="table table-bordered table-striped" style="max-width:700px;">
+                <h5>Sales Breakdown:</h5>
+                <table class="table table-bordered table-striped">
                     <thead>
                         <tr>
                             <th>Product Name</th>
-                            <th>Unit Price (đ)</th>
-                            <th>Quantity</th>
+                            <th>Quantity Sold</th>
+                            <th>Total Revenue</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
-                        foreach ($labels as $label) {
-                            $qty = $filteredQuantityData[$label] ?? 0;
-                            $price = $priceData[$label] ?? 0;
+                        for ($i = 0; $i < count($labels); $i++) {
                             echo "<tr>
-                                    <td>" . htmlspecialchars($label) . "</td>
-                                    <td>" . number_format($price) . "</td>
-                                    <td>$qty</td>
+                                    <td>" . htmlspecialchars($labels[$i]) . "</td>
+                                    <td>" . $quantityData[$labels[$i]] . "</td>
+                                    <td>$" . number_format($revenueData[$i]) . "</td>
                                 </tr>";
                         }
                         ?>
@@ -173,7 +162,7 @@ $top5Quantities = array_slice($quantityData, 0, 5);
                 labels: <?= json_encode($labels) ?>,
                 datasets: [{
                     label: 'Revenue ($)',
-                    data: <?= json_encode($data) ?>,
+                    data: <?= json_encode($revenueData) ?>,
                     backgroundColor: 'rgba(13, 110, 253, 0.7)',
                     borderColor: '#0d6efd',
                     borderWidth: 1
@@ -181,12 +170,6 @@ $top5Quantities = array_slice($quantityData, 0, 5);
             },
             options: {
                 responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Revenue Chart by Product'
-                    }
-                },
                 scales: {
                     y: {
                         beginAtZero: true,
@@ -215,12 +198,6 @@ $top5Quantities = array_slice($quantityData, 0, 5);
             },
             options: {
                 responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Top 5 Best-Selling Books by Quantity'
-                    }
-                },
                 scales: {
                     y: {
                         beginAtZero: true,

@@ -20,15 +20,15 @@ if (
    isset($_POST['product_quantity'])
 ) {
    $buy_now_product = [
-      'id' => $_POST['product_id'],
-      'quantity' => $_POST['product_quantity']
+      'id' => (int)$_POST['product_id'],
+      'quantity' => (int)$_POST['product_quantity']
    ];
 }
 
 if (isset($_POST['order_btn'])) {
 
    $name = mysqli_real_escape_string($conn, $_POST['name']);
-   $number = $_POST['number'];
+   $number = mysqli_real_escape_string($conn, $_POST['number']);
    $email = mysqli_real_escape_string($conn, $_POST['email']);
    $method = mysqli_real_escape_string($conn, $_POST['method']);
    $address = mysqli_real_escape_string($conn, 'Flat no. ' . $_POST['flat'] . ', ' . $_POST['street'] . ', ' . $_POST['city'] . ', ' . $_POST['country'] . ' - ' . $_POST['pin_code']);
@@ -40,13 +40,13 @@ if (isset($_POST['order_btn'])) {
    $is_stock_valid = true;
 
    // ---------------------------------------------------------
-   // STEP 1: GATHER ITEMS & CHECK STOCK
+   // STEP 1: GATHER ITEMS & CHECK STOCK (read-only checks)
    // ---------------------------------------------------------
 
    if ($buy_now_product) {
       // --- BUY NOW LOGIC ---
-      $pid = $buy_now_product['id'];
-      $qty = $buy_now_product['quantity'];
+      $pid = intval($buy_now_product['id']);
+      $qty = intval($buy_now_product['quantity']);
 
       // Get real price and stock from DB (Security: Don't trust POST price)
       $product_query = mysqli_query($conn, "SELECT * FROM `products` WHERE id = '$pid'") or die('query failed');
@@ -95,6 +95,9 @@ if (isset($_POST['order_btn'])) {
                   $legacy_products_string[] = $real_product['book_name'] . ' (' . $cart_item['quantity'] . ')';
                   $cart_total += ($real_product['price'] * $cart_item['quantity']);
                }
+            } else {
+               $message[] = 'Product "' . htmlspecialchars($cart_item['name']) . '" not found - it was removed from the catalog.';
+               $is_stock_valid = false;
             }
          }
       } else {
@@ -104,43 +107,90 @@ if (isset($_POST['order_btn'])) {
    }
 
    // ---------------------------------------------------------
-   // STEP 2: PLACE ORDER IF STOCK IS VALID
+   // STEP 2: PLACE ORDER USING TRANSACTION IF STOCK IS VALID
    // ---------------------------------------------------------
 
    if ($is_stock_valid && $cart_total > 0) {
 
       $total_products = implode(', ', $legacy_products_string);
 
-      // Check duplicate order
+      // Check duplicate order (simple dedupe)
       $order_query = mysqli_query($conn, "SELECT * FROM `orders` WHERE name = '$name' AND number = '$number' AND email = '$email' AND method = '$method' AND address = '$address' AND total_products = '$total_products' AND total_price = '$cart_total'") or die('query failed');
 
       if (mysqli_num_rows($order_query) > 0) {
          $message[] = 'order already placed!';
       } else {
 
-         // A. Insert into MAIN ORDERS table
-         mysqli_query($conn, "INSERT INTO `orders`(user_id, name, number, email, method, address, total_products, total_price, placed_on) VALUES('$user_id', '$name', '$number', '$email', '$method', '$address', '$total_products', '$cart_total', '$placed_on')") or die('query failed');
+         // BEGIN TRANSACTION
+         mysqli_begin_transaction($conn, MYSQLI_TRANS_START_READ_WRITE);
+         $transaction_ok = true;
 
-         // Get the ID of the order we just created
-         $order_id = mysqli_insert_id($conn);
-
-         // B. Insert into ORDER_ITEMS and DEDUCT STOCK
-         foreach ($final_order_items as $item) {
-            $pid = $item['product_id'];
-            $qty = $item['quantity'];
-            $price = $item['price'];
-
-            // 1. Insert into normalized table
-            mysqli_query($conn, "INSERT INTO `order_items` (order_id, product_id, quantity, price) VALUES ('$order_id', '$pid', '$qty', '$price')");
-
-            // 2. Deduct Stock
-            mysqli_query($conn, "UPDATE `products` SET stock_quantity = stock_quantity - $qty WHERE id = '$pid'");
+         // Insert into MAIN ORDERS table
+         $insert_order_sql = "INSERT INTO `orders`(user_id, name, number, email, method, address, total_products, total_price, placed_on) VALUES('$user_id', '$name', '$number', '$email', '$method', '$address', '$total_products', '$cart_total', '$placed_on')";
+         if (!mysqli_query($conn, $insert_order_sql)) {
+            $transaction_ok = false;
+            $transaction_error = 'Failed to create order: ' . mysqli_error($conn);
+         } else {
+            $order_id = mysqli_insert_id($conn);
          }
 
-         // C. Clean up
-         $message[] = 'order placed successfully!';
-         if (!$buy_now_product) {
-            mysqli_query($conn, "DELETE FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
+         // For each item: lock row FOR UPDATE, verify, insert order_item, decrement stock safely
+         if ($transaction_ok) {
+            foreach ($final_order_items as $item) {
+               $pid = intval($item['product_id']);
+               $qty = intval($item['quantity']);
+               $price = intval($item['price']);
+
+               // Lock the product row
+               $lock_res = mysqli_query($conn, "SELECT stock_quantity, book_name FROM `products` WHERE id = '$pid' FOR UPDATE") or ($transaction_ok = false);
+               if (!$transaction_ok) break;
+
+               if (mysqli_num_rows($lock_res) == 0) {
+                  $transaction_ok = false;
+                  $transaction_error = 'Product not found during finalization.';
+                  break;
+               }
+
+               $p = mysqli_fetch_assoc($lock_res);
+               if ($p['stock_quantity'] < $qty) {
+                  $transaction_ok = false;
+                  $transaction_error = 'Insufficient stock for "' . $p['book_name'] . '". Available: ' . $p['stock_quantity'];
+                  break;
+               }
+
+               // Insert order item
+               $insert_item_sql = "INSERT INTO `order_items` (order_id, product_id, quantity, price) VALUES ('$order_id', '$pid', '$qty', '$price')";
+               if (!mysqli_query($conn, $insert_item_sql)) {
+                  $transaction_ok = false;
+                  $transaction_error = 'Failed to insert order item: ' . mysqli_error($conn);
+                  break;
+               }
+
+               // Decrement stock safely (extra guard in WHERE)
+               $update_stock_sql = "UPDATE `products` SET stock_quantity = stock_quantity - $qty WHERE id = '$pid' AND stock_quantity >= $qty";
+               if (!mysqli_query($conn, $update_stock_sql)) {
+                  $transaction_ok = false;
+                  $transaction_error = 'Failed to update stock: ' . mysqli_error($conn);
+                  break;
+               }
+               if (mysqli_affected_rows($conn) == 0) {
+                  $transaction_ok = false;
+                  $transaction_error = 'Stock update failed due to concurrent change for product id ' . $pid;
+                  break;
+               }
+            }
+         }
+
+         // Commit or rollback
+         if ($transaction_ok) {
+            mysqli_commit($conn);
+            $message[] = 'order placed successfully!';
+            if (!$buy_now_product) {
+               mysqli_query($conn, "DELETE FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
+            }
+         } else {
+            mysqli_rollback($conn);
+            $message[] = isset($transaction_error) ? $transaction_error : 'Order failed, rolled back.';
          }
       }
    }

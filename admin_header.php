@@ -67,6 +67,12 @@ $admin_name = isset($_SESSION['admin_name']) ? htmlspecialchars($_SESSION['admin
               <i class="fas fa-chart-bar me-1"></i>Statistics
             </a>
           </li>
+          <!-- ADD THIS NEW LINK -->
+          <li class="nav-item">
+            <a class="nav-link" href="admin_import.php">
+              <i class="fas fa-file-import me-1"></i> Import
+            </a>
+          </li>
         </ul>
         <div class="dropdown">
           <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">

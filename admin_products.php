@@ -20,13 +20,14 @@ $publishers_all = mysqli_query($conn, "SELECT id, publisher_name FROM `publisher
 if (isset($_POST['add_product'])) {
 
    $book_name = mysqli_real_escape_string($conn, $_POST['book_name']);
-   $author_id = $_POST['author_id'];
-   $publisher_id = $_POST['publisher_id'];
+   $author_id = intval($_POST['author_id']);
+   $publisher_id = intval($_POST['publisher_id']);
    $book_description = mysqli_real_escape_string($conn, $_POST['book_description']);
    $tag = mysqli_real_escape_string($conn, $_POST['tag']);
-   $publish_year = $_POST['publish_year'];
-   $total_page = $_POST['total_page'];
-   $price = $_POST['price'];
+   $publish_year = intval($_POST['publish_year']);
+   $total_page = intval($_POST['total_page']);
+   $price = intval($_POST['price']);
+   $stock_quantity = isset($_POST['stock_quantity']) ? intval($_POST['stock_quantity']) : 0;
    $image = $_FILES['image']['name'];
    $image_size = $_FILES['image']['size'];
    $image_tmp_name = $_FILES['image']['tmp_name'];
@@ -37,7 +38,8 @@ if (isset($_POST['add_product'])) {
    if (mysqli_num_rows($select_product_name) > 0) {
       $message[] = 'Book name already added';
    } else {
-      $add_product_query = mysqli_query($conn, "INSERT INTO `products`(book_name, author_id, publisher_id, book_description, tag, publish_year, total_page, price, image) VALUES('$book_name', '$author_id', '$publisher_id', '$book_description', '$tag', '$publish_year', '$total_page', '$price', '$image')") or die('query failed');
+      // include stock_quantity in insert to match new schema
+      $add_product_query = mysqli_query($conn, "INSERT INTO `products`(book_name, author_id, publisher_id, book_description, tag, publish_year, total_page, price, stock_quantity, image) VALUES('$book_name', '$author_id', '$publisher_id', '$book_description', '$tag', '$publish_year', '$total_page', '$price', '$stock_quantity', '$image')") or die('query failed');
 
       if ($add_product_query) {
          if ($image_size > 2000000) {
@@ -56,7 +58,11 @@ if (isset($_GET['delete'])) {
    $delete_id = intval($_GET['delete']);
    $delete_image_query = mysqli_query($conn, "SELECT image FROM `products` WHERE id = $delete_id") or die('query failed');
    $fetch_delete_image = mysqli_fetch_assoc($delete_image_query);
-   unlink('uploaded_img/' . $fetch_delete_image['image']);
+   // unlink only if file exists
+   $delete_path = __DIR__ . '/uploaded_img/' . $fetch_delete_image['image'];
+   if (!empty($fetch_delete_image['image']) && file_exists($delete_path)) {
+      @unlink($delete_path);
+   }
    mysqli_query($conn, "DELETE FROM `products` WHERE id = $delete_id") or die('query failed');
    header('Location: admin_products.php');
    exit;
@@ -64,17 +70,19 @@ if (isset($_GET['delete'])) {
 
 if (isset($_POST['update_product'])) {
 
-   $update_p_id = $_POST['update_p_id'];
+   $update_p_id = intval($_POST['update_p_id']);
    $update_book_name = mysqli_real_escape_string($conn, $_POST['update_book_name']);
-   $update_author_id = $_POST['update_author_id'];
-   $update_publisher_id = $_POST['update_publisher_id'];
+   $update_author_id = intval($_POST['update_author_id']);
+   $update_publisher_id = intval($_POST['update_publisher_id']);
    $update_book_description = mysqli_real_escape_string($conn, $_POST['update_book_description']);
    $update_tag = mysqli_real_escape_string($conn, $_POST['update_tag']);
-   $update_publish_year = $_POST['update_publish_year'];
-   $update_total_page = $_POST['update_total_page'];
-   $update_price = $_POST['update_price'];
+   $update_publish_year = intval($_POST['update_publish_year']);
+   $update_total_page = intval($_POST['update_total_page']);
+   $update_price = intval($_POST['update_price']);
+   $update_stock_quantity = isset($_POST['update_stock_quantity']) ? intval($_POST['update_stock_quantity']) : 0;
 
-   mysqli_query($conn, "UPDATE `products` SET book_name = '$update_book_name', author_id = '$update_author_id', publisher_id = '$update_publisher_id', book_description = '$update_book_description', tag = '$update_tag', publish_year = '$update_publish_year', total_page = '$update_total_page', price = '$update_price' WHERE id = '$update_p_id'") or die('query failed');
+   // include stock_quantity in update
+   mysqli_query($conn, "UPDATE `products` SET book_name = '$update_book_name', author_id = '$update_author_id', publisher_id = '$update_publisher_id', book_description = '$update_book_description', tag = '$update_tag', publish_year = '$update_publish_year', total_page = '$update_total_page', price = '$update_price', stock_quantity = '$update_stock_quantity' WHERE id = '$update_p_id'") or die('query failed');
 
    $update_image = $_FILES['update_image']['name'];
    $update_image_tmp_name = $_FILES['update_image']['tmp_name'];
@@ -88,7 +96,10 @@ if (isset($_POST['update_product'])) {
       } else {
          mysqli_query($conn, "UPDATE `products` SET image = '$update_image' WHERE id = '$update_p_id'") or die('query failed');
          move_uploaded_file($update_image_tmp_name, $update_folder);
-         unlink('uploaded_img/' . $update_old_image);
+         $old_path = __DIR__ . '/uploaded_img/' . $update_old_image;
+         if (!empty($update_old_image) && file_exists($old_path)) {
+            @unlink($old_path);
+         }
       }
    }
 
@@ -190,6 +201,9 @@ mysqli_data_seek($publishers_all, 0);
                         <input type="number" min="0" name="price" class="form-control" placeholder="Enter product price" required>
                      </div>
                      <div class="mb-3">
+                        <input type="number" name="stock_quantity" min="0" value="0" class="form-control" placeholder="Stock quantity" required>
+                     </div>
+                     <div class="mb-3">
                         <input type="file" name="image" accept="image/jpg, image/jpeg, image/png" class="form-control" required>
                      </div>
                      <div class="d-grid">
@@ -270,6 +284,7 @@ mysqli_data_seek($publishers_all, 0);
                         <p class="mb-1"><strong>Publisher:</strong> <?php echo htmlspecialchars($fetch_products['publisher_name']); ?></p>
                         <p class="mb-1"><strong>Year:</strong> <?php echo htmlspecialchars($fetch_products['publish_year']); ?></p>
                         <p class="mb-1"><strong>Pages:</strong> <?php echo htmlspecialchars($fetch_products['total_page']); ?></p>
+                        <p class="mb-1"><strong>Stock:</strong> <?php echo intval($fetch_products['stock_quantity']); ?></p>
                         <p class="mb-1"><strong>Tag:</strong> <?php echo htmlspecialchars($fetch_products['tag']); ?></p>
                         <p class="card-text text-danger fw-bold">$<?php echo $fetch_products['price']; ?>/-</p>
                         <a href="admin_products.php?update=<?php echo $fetch_products['id']; ?>" class="btn btn-warning me-2">Update</a>
@@ -323,6 +338,9 @@ mysqli_data_seek($publishers_all, 0);
                                  </option>
                               <?php } ?>
                            </select>
+                        </div>
+                        <div class="mb-3">
+                           <input type="number" name="update_stock_quantity" value="<?php echo intval($fetch_update['stock_quantity']); ?>" min="0" class="form-control" placeholder="Stock quantity">
                         </div>
                         <div class="mb-3">
                            <select name="update_publisher_id" class="form-select" required>
