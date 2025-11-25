@@ -1,12 +1,37 @@
 <?php
+if (session_status() == PHP_SESSION_NONE) {
+   session_start();
+}
+
+// If no session but remember cookie exists, try to log in automatically
+if (empty($_SESSION['user_id']) && empty($_SESSION['admin_id']) && !empty($_COOKIE['remember_token']) && isset($conn)) {
+   $token = mysqli_real_escape_string($conn, $_COOKIE['remember_token']);
+   $res = mysqli_query($conn, "SELECT * FROM `users` WHERE remember_token = '$token' LIMIT 1");
+   if ($res && mysqli_num_rows($res) > 0) {
+      $user = mysqli_fetch_assoc($res);
+      if ($user['user_type'] === 'admin') {
+         $_SESSION['admin_name'] = $user['name'];
+         $_SESSION['admin_email'] = $user['email'];
+         $_SESSION['admin_id'] = $user['id'];
+      } else {
+         $_SESSION['user_name'] = $user['name'];
+         $_SESSION['user_email'] = $user['email'];
+         $_SESSION['user_id'] = $user['id'];
+      }
+   }
+}
+
+// ensure $user_id is defined for later use
+$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0;
+
 if (isset($message)) {
    foreach ($message as $msg) {
       echo '
-      <div class="alert alert-info alert-dismissible fade show position-absolute top-0 start-50 translate-middle-x mt-3" role="alert" style="z-index:1050; min-width:300px;">
-         <span>' . $msg . '</span>
-         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-      ';
+     <div class="alert alert-info alert-dismissible fade show position-absolute top-0 start-50 translate-middle-x mt-3" role="alert" style="z-index:1050; min-width:300px;">
+       <span>' . $msg . '</span>
+       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+     </div>
+     ';
    }
 }
 ?>
@@ -84,8 +109,8 @@ if (isset($message)) {
                   <i class="fas fa-user"></i>
                </a>
                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                  <li><span class="dropdown-item-text">Username: <strong><?php echo $_SESSION['user_name']; ?></strong></span></li>
-                  <li><span class="dropdown-item-text">Email: <strong><?php echo $_SESSION['user_email']; ?></strong></span></li>
+                  <li><span class="dropdown-item-text">Username: <strong><?php echo isset($_SESSION['user_name']) ? $_SESSION['user_name'] : ''; ?></strong></span></li>
+                  <li><span class="dropdown-item-text">Email: <strong><?php echo isset($_SESSION['user_email']) ? $_SESSION['user_email'] : ''; ?></strong></span></li>
                   <li>
                      <hr class="dropdown-divider">
                   </li>

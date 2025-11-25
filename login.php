@@ -7,6 +7,7 @@ if (isset($_POST['submit'])) {
 
    $email = mysqli_real_escape_string($conn, $_POST['email']);
    $pass = mysqli_real_escape_string($conn, md5($_POST['password']));
+   $remember = isset($_POST['remember']);
 
    $select_users = mysqli_query($conn, "SELECT * FROM `users` WHERE email = '$email' AND password = '$pass'") or die('query failed');
 
@@ -19,12 +20,25 @@ if (isset($_POST['submit'])) {
          $_SESSION['admin_name'] = $row['name'];
          $_SESSION['admin_email'] = $row['email'];
          $_SESSION['admin_id'] = $row['id'];
+         if ($remember) {
+            // generate secure random token, store in DB and set cookie for 30 days
+            $token = bin2hex(random_bytes(16));
+            $token_esc = mysqli_real_escape_string($conn, $token);
+            mysqli_query($conn, "UPDATE `users` SET remember_token = '$token_esc' WHERE id = {$row['id']}");
+            setcookie('remember_token', $token, time() + (86400 * 30), "/");
+         }
          header('location:admin_page.php');
       } elseif ($row['user_type'] == 'user') {
 
          $_SESSION['user_name'] = $row['name'];
          $_SESSION['user_email'] = $row['email'];
          $_SESSION['user_id'] = $row['id'];
+         if ($remember) {
+            $token = bin2hex(random_bytes(16));
+            $token_esc = mysqli_real_escape_string($conn, $token);
+            mysqli_query($conn, "UPDATE `users` SET remember_token = '$token_esc' WHERE id = {$row['id']}");
+            setcookie('remember_token', $token, time() + (86400 * 30), "/");
+         }
          header('location:home.php');
       }
    } else {
@@ -131,6 +145,12 @@ if (isset($_POST['submit'])) {
             <div class="form-floating mb-3">
                <input type="password" name="password" id="loginPassword" placeholder="Enter your password" required class="form-control">
                <label for="loginPassword">Password</label>
+            </div>
+            <div class="form-check mb-3">
+               <input class="form-check-input" type="checkbox" name="remember" id="rememberMe">
+               <label class="form-check-label" for="rememberMe">
+                  Remember me
+               </label>
             </div>
             <div class="d-grid mb-3">
                <input type="submit" name="submit" value="Login now" class="btn btn-primary btn-lg">
