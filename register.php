@@ -1,6 +1,18 @@
 <?php
+// Load Composer's autoloader
+require 'vendor/autoload.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+use Dotenv\Dotenv;
+
+// Load .env variables
+$dotenv = Dotenv::createImmutable(__DIR__);
+$dotenv->load();
 
 include 'config.php';
+
+$message = [];
 
 if (isset($_POST['submit'])) {
 
@@ -8,24 +20,63 @@ if (isset($_POST['submit'])) {
    $email = mysqli_real_escape_string($conn, $_POST['email']);
    $pass = mysqli_real_escape_string($conn, md5($_POST['password']));
    $cpass = mysqli_real_escape_string($conn, md5($_POST['cpassword']));
-   $user_type = 'user'; // Always set as 'user'
+   $user_type = 'user';
 
-   $select_users = mysqli_query($conn, "SELECT * FROM `users` WHERE email = '$email' AND password = '$pass'") or die('Query failed: ' . mysqli_error($conn));
+   // Generate Verification Code
+   $verification_code = md5(rand());
 
-   // $message use to annouce the result of the process
+   $select_users = mysqli_query($conn, "SELECT * FROM `users` WHERE email = '$email'") or die('Query failed: ' . mysqli_error($conn));
+
    if (mysqli_num_rows($select_users) > 0) {
-      $message[] = 'user already exist!';
+      $message[] = 'User already exists!';
    } else {
       if ($pass != $cpass) {
-         $message[] = 'confirm password not matched!';
+         $message[] = 'Confirm password not matched!';
       } else {
-         mysqli_query($conn, "INSERT INTO `users`(name, email, password, user_type) VALUES('$name', '$email', '$cpass', '$user_type')") or die('Query failed: ' . mysqli_error($conn));
-         $message[] = 'registered successfully!';
-         header('location:login.php');
+         // Insert user with is_verified = 0
+         $insert = mysqli_query($conn, "INSERT INTO `users`(name, email, password, user_type, verification_code, is_verified) VALUES('$name', '$email', '$cpass', '$user_type', '$verification_code', 0)") or die('Query failed');
+
+         if ($insert) {
+            // --- SEND EMAIL LOGIC ---
+            $mail = new PHPMailer(true);
+
+            try {
+               // Server settings
+               $mail->isSMTP();
+               $mail->Host       = $_ENV['SMTP_HOST'];
+               $mail->SMTPAuth   = true;
+               $mail->Username   = $_ENV['SMTP_USER'];
+               $mail->Password   = $_ENV['SMTP_PASS'];
+               $mail->SMTPSecure = $_ENV['SMTP_SECURE']; // tls
+               $mail->Port       = $_ENV['SMTP_PORT'];    // 587
+
+               // Recipients
+               $mail->setFrom($_ENV['MAIL_FROM'], $_ENV['MAIL_FROM_NAME']);
+               $mail->addAddress($email, $name);
+
+               // Content
+               $mail->isHTML(true);
+               $mail->Subject = 'Verify Your Email Address - Bookly';
+
+               $verify_link = "http://localhost/project/verify.php?email=$email&code=$verification_code";
+
+               $mail->Body    = "
+                  <h3>Welcome to Bookly, $name!</h3>
+                  <p>Please click the link below to verify your account:</p>
+                  <p><a href='$verify_link'>$verify_link</a></p>
+                  <br>
+                  <p>If you did not request this, please ignore this email.</p>
+               ";
+
+               $mail->send();
+               $message[] = 'Registered! Please check your email to verify your account.';
+            } catch (Exception $e) {
+               $message[] = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+            }
+         }
       }
    }
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -33,23 +84,10 @@ if (isset($_POST['submit'])) {
 
 <head>
    <meta charset="UTF-8">
-   <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>Register</title>
-
-   <!-- Bootstrap 5.3.x CSS -->
    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-   <!-- Bootstrap 5.3.x CSS -->
-   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-   <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-   <!-- custom css file link  -->
-   <!-- <link rel="stylesheet" href="css/style.css"> -->
-   <!-- <link rel="stylesheet" href="css/style.css"> -->
-
 </head>
 
 <body class="bg-light" style="background: linear-gradient(135deg, #e0e7ff 0%, #fff 100%); min-height:100vh;">
@@ -79,7 +117,6 @@ if (isset($_POST['submit'])) {
 
       .register-title {
          font-weight: 700;
-         letter-spacing: 1px;
          color: #2d3a8c;
       }
 
@@ -102,11 +139,10 @@ if (isset($_POST['submit'])) {
    if (isset($message)) {
       foreach ($message as $msg) {
          echo '
-   <div class="alert alert-warning alert-dismissible fade show position-absolute top-0 start-50 translate-middle-x mt-3" role="alert" style="z-index:1050; min-width:300px;">
-      <span>' . $msg . '</span>
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-   </div>
-   ';
+         <div class="alert alert-info alert-dismissible fade show position-absolute top-0 start-50 translate-middle-x mt-3" role="alert" style="z-index:1050; min-width:300px;">
+            <span>' . $msg . '</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+         </div>';
       }
    }
    ?>
@@ -114,11 +150,11 @@ if (isset($_POST['submit'])) {
    <div class="container d-flex align-items-center justify-content-center min-vh-100">
       <div class="register-card card p-4 fade-in" style="max-width: 400px; width: 100%;">
          <div class="text-center mb-3">
-            <img src="https://cdn-icons-png.flaticon.com/512/5087/5087579.png" alt="Register" width="64" class="mb-2" style="filter: drop-shadow(0 2px 8px #a5b4fc);">
+            <img src="https://cdn-icons-png.flaticon.com/512/5087/5087579.png" alt="Register" width="64" class="mb-2">
             <h3 class="register-title mb-1">Create Account</h3>
-            <div class="desc">Register to start shopping, track your orders, and enjoy exclusive deals!</div>
+            <div class="desc">Register to start shopping!</div>
          </div>
-         <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
+         <form action="" method="post">
             <div class="form-floating mb-3">
                <input type="text" name="name" id="registerName" placeholder="Enter your name" required class="form-control">
                <label for="registerName">Full Name</label>
@@ -142,8 +178,6 @@ if (isset($_POST['submit'])) {
          </form>
       </div>
    </div>
-
-   <!-- Bootstrap 5.3.x JS Bundle -->
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

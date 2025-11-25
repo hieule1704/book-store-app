@@ -1,14 +1,27 @@
 {
+    "name": "doubleh/bookstore",
+    "description": "A PHP Bookstore project with Google Login and Email Verification",
+    "type": "project",
     "require": {
-        "google/apiclient": "^2.18.0"
+        "php": "^8.0",
+        "google/apiclient": "^2.15",
+        "vlucas/phpdotenv": "^5.5",
+        "phpmailer/phpmailer": "^7.0"
     },
-    "scripts": {
-        "pre-autoload-dump": "Google\\Task\\Composer::cleanup"
+    "authors": [
+        {
+            "name": "Ethan Lee",
+            "email": "lehieu17042004@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
     },
-    "extra": {
-        "google/apiclient-services": [
-            "Drive",
-            "YouTube"
-        ]
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
     }
 }

@@ -6,44 +6,43 @@ include_once __DIR__ . '/session_config.php';
 
 if (isset($_POST['submit'])) {
 
-   $email = mysqli_real_escape_string($conn, $_POST['email']);
-   $pass = mysqli_real_escape_string($conn, md5($_POST['password']));
-   $remember = isset($_POST['remember']);
-
-   $select_users = mysqli_query($conn, "SELECT * FROM `users` WHERE email = '$email' AND password = '$pass'") or die('query failed');
-
    if (mysqli_num_rows($select_users) > 0) {
 
       $row = mysqli_fetch_assoc($select_users);
 
-      if ($row['user_type'] == 'admin') {
-
-         $_SESSION['admin_name'] = $row['name'];
-         $_SESSION['admin_email'] = $row['email'];
-         $_SESSION['admin_id'] = $row['id'];
-         if ($remember) {
-            // generate secure random token, store in DB and set cookie for 30 days
-            $token = bin2hex(random_bytes(16));
-            $token_esc = mysqli_real_escape_string($conn, $token);
-            mysqli_query($conn, "UPDATE `users` SET remember_token = '$token_esc' WHERE id = {$row['id']}");
-            setcookie('remember_token', $token, time() + (86400 * 30), "/");
+      // STRICT CHECK: Explicitly check for 1. If it's 0, NULL, or anything else, BLOCK them.
+      if ($row['is_verified'] != 1) {
+         $message[] = 'Account not verified! Please check your email.';
+      } else {
+         // --- LOGIN SUCCESS LOGIC ---
+         if ($row['user_type'] == 'admin') {
+            $_SESSION['admin_name'] = $row['name'];
+            $_SESSION['admin_email'] = $row['email'];
+            $_SESSION['admin_id'] = $row['id'];
+            if ($remember) {
+               $token = bin2hex(random_bytes(16));
+               $token_esc = mysqli_real_escape_string($conn, $token);
+               mysqli_query($conn, "UPDATE `users` SET remember_token = '$token_esc' WHERE id = {$row['id']}");
+               setcookie('remember_token', $token, time() + (86400 * 30), "/");
+            }
+            header('location:admin_page.php');
+            exit; // Always exit after header redirect
+         } elseif ($row['user_type'] == 'user') {
+            $_SESSION['user_name'] = $row['name'];
+            $_SESSION['user_email'] = $row['email'];
+            $_SESSION['user_id'] = $row['id'];
+            if ($remember) {
+               $token = bin2hex(random_bytes(16));
+               $token_esc = mysqli_real_escape_string($conn, $token);
+               mysqli_query($conn, "UPDATE `users` SET remember_token = '$token_esc' WHERE id = {$row['id']}");
+               setcookie('remember_token', $token, time() + (86400 * 30), "/");
+            }
+            header('location:home.php');
+            exit; // Always exit after header redirect
          }
-         header('location:admin_page.php');
-      } elseif ($row['user_type'] == 'user') {
-
-         $_SESSION['user_name'] = $row['name'];
-         $_SESSION['user_email'] = $row['email'];
-         $_SESSION['user_id'] = $row['id'];
-         if ($remember) {
-            $token = bin2hex(random_bytes(16));
-            $token_esc = mysqli_real_escape_string($conn, $token);
-            mysqli_query($conn, "UPDATE `users` SET remember_token = '$token_esc' WHERE id = {$row['id']}");
-            setcookie('remember_token', $token, time() + (86400 * 30), "/");
-         }
-         header('location:home.php');
       }
    } else {
-      $message[] = 'incorrect email or password!';
+      $message[] = 'Incorrect email or password!';
    }
 }
 ?>
