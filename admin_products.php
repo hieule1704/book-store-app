@@ -2,12 +2,13 @@
 
 include 'config.php';
 
-session_start();
+// remove direct session_start(); and include the secure session config instead
+include_once __DIR__ . '/session_config.php';
 
-$admin_id = $_SESSION['admin_id'];
-
-if (!isset($admin_id)) {
-   header('location:login.php');
+$admin_id = isset($_SESSION['admin_id']) ? intval($_SESSION['admin_id']) : null;
+if (!$admin_id) {
+   header('Location: login.php');
+   exit;
 }
 
 // Fetch authors and publishers for dropdowns (for both add and filter forms)
@@ -52,12 +53,13 @@ if (isset($_POST['add_product'])) {
 }
 
 if (isset($_GET['delete'])) {
-   $delete_id = $_GET['delete'];
-   $delete_image_query = mysqli_query($conn, "SELECT image FROM `products` WHERE id = '$delete_id'") or die('query failed');
+   $delete_id = intval($_GET['delete']);
+   $delete_image_query = mysqli_query($conn, "SELECT image FROM `products` WHERE id = $delete_id") or die('query failed');
    $fetch_delete_image = mysqli_fetch_assoc($delete_image_query);
    unlink('uploaded_img/' . $fetch_delete_image['image']);
-   mysqli_query($conn, "DELETE FROM `products` WHERE id = '$delete_id'") or die('query failed');
-   header('location:admin_products.php');
+   mysqli_query($conn, "DELETE FROM `products` WHERE id = $delete_id") or die('query failed');
+   header('Location: admin_products.php');
+   exit;
 }
 
 if (isset($_POST['update_product'])) {
@@ -286,8 +288,8 @@ mysqli_data_seek($publishers_all, 0);
 
    <?php
    if (isset($_GET['update'])) {
-      $update_id = $_GET['update'];
-      $update_query = mysqli_query($conn, "SELECT * FROM `products` WHERE id = '$update_id'") or die('query failed');
+      $update_id = intval($_GET['update']);
+      $update_query = mysqli_query($conn, "SELECT * FROM `products` WHERE id = $update_id") or die('query failed');
       if (mysqli_num_rows($update_query) > 0) {
          $fetch_update = mysqli_fetch_assoc($update_query);
 

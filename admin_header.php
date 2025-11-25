@@ -1,14 +1,17 @@
 <?php
-if (isset($message)) {
-  foreach ($message as $message) {
+// messages (if any)
+if (isset($message) && is_array($message)) {
+  foreach ($message as $msg) {
     echo '
       <div class="alert alert-info alert-dismissible fade show position-absolute top-0 start-50 translate-middle-x mt-3" role="alert" style="z-index:1050; min-width:300px;">
-         <span>' . $message . '</span>
+         <span>' . htmlspecialchars($msg) . '</span>
          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
       ';
   }
 }
+// safe admin name for header
+$admin_name = isset($_SESSION['admin_name']) ? htmlspecialchars($_SESSION['admin_name']) : 'Admin';
 ?>
 
 <header>
@@ -68,11 +71,11 @@ if (isset($message)) {
         <div class="dropdown">
           <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="fas fa-user fa-lg me-2"></i>
-            <?php echo $_SESSION['admin_name']; ?>
+            <?php echo $admin_name; ?>
           </a>
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
-            <li><span class="dropdown-item-text">Username: <strong><?php echo $_SESSION['admin_name']; ?></strong></span></li>
-            <li><span class="dropdown-item-text">Email: <strong><?php echo $_SESSION['admin_email']; ?></strong></span></li>
+            <li><span class="dropdown-item-text">Username: <strong><?php echo $admin_name; ?></strong></span></li>
+            <li><span class="dropdown-item-text">Email: <strong><?php echo isset($_SESSION['admin_email']) ? htmlspecialchars($_SESSION['admin_email']) : ''; ?></strong></span></li>
             <li>
               <hr class="dropdown-divider">
             </li>

@@ -1,23 +1,26 @@
 <?php
-if (session_status() == PHP_SESSION_NONE) {
-   session_start();
-}
+include_once __DIR__ . '/config.php';
+include_once __DIR__ . '/session_config.php';
 
-// If no session but remember cookie exists, try to log in automatically
-if (empty($_SESSION['user_id']) && empty($_SESSION['admin_id']) && !empty($_COOKIE['remember_token']) && isset($conn)) {
+// If no active session but remember cookie exists, attempt auto-login
+if (empty($_SESSION['user_id']) && empty($_SESSION['admin_id']) && !empty($_COOKIE['remember_token'])) {
    $token = mysqli_real_escape_string($conn, $_COOKIE['remember_token']);
    $res = mysqli_query($conn, "SELECT * FROM `users` WHERE remember_token = '$token' LIMIT 1");
    if ($res && mysqli_num_rows($res) > 0) {
       $user = mysqli_fetch_assoc($res);
       if ($user['user_type'] === 'admin') {
-         $_SESSION['admin_name'] = $user['name'];
+         $_SESSION['admin_name']  = $user['name'];
          $_SESSION['admin_email'] = $user['email'];
-         $_SESSION['admin_id'] = $user['id'];
+         $_SESSION['admin_id']    = $user['id'];
       } else {
-         $_SESSION['user_name'] = $user['name'];
+         $_SESSION['user_name']  = $user['name'];
          $_SESSION['user_email'] = $user['email'];
-         $_SESSION['user_id'] = $user['id'];
+         $_SESSION['user_id']    = $user['id'];
       }
+      // optionally refresh token/cookie here for rotation
+   } else {
+      // invalid token: clear cookie
+      setcookie('remember_token', '', time() - 3600, '/');
    }
 }
 

@@ -7,7 +7,9 @@ $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
 include 'config.php';
-session_start();
+// remove direct session_start(); and include the secure session config instead
+include_once __DIR__ . '/session_config.php';
+
 
 // Google Client Configuration
 $clientID = $_ENV['GOOGLE_CLIENT_ID'];

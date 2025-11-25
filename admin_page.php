@@ -2,12 +2,13 @@
 
 include 'config.php';
 
-session_start();
+// remove direct session_start(); and include the secure session config instead
+include_once __DIR__ . '/session_config.php';
 
-$admin_id = $_SESSION['admin_id'];
-
-if (!isset($admin_id)) {
-   header('location:login.php');
+$admin_id = isset($_SESSION['admin_id']) ? intval($_SESSION['admin_id']) : null;
+if (!$admin_id) {
+   header('Location: login.php');
+   exit;
 }
 
 ?>

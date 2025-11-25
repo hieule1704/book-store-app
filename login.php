@@ -1,7 +1,8 @@
 <?php
 
 include 'config.php';
-session_start();
+// remove direct session_start(); and include the secure session config instead
+include_once __DIR__ . '/session_config.php';
 
 if (isset($_POST['submit'])) {
 
@@ -45,7 +46,6 @@ if (isset($_POST['submit'])) {
       $message[] = 'incorrect email or password!';
    }
 }
-
 ?>
 
 <!DOCTYPE html>

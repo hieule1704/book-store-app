@@ -2,12 +2,12 @@
 
 include 'config.php';
 
-session_start();
+// remove direct session_start(); and include the secure session config instead
+include_once __DIR__ . '/session_config.php';
 
-$admin_id = isset($_SESSION['admin_id']) ? $_SESSION['admin_id'] : null;
-
+$admin_id = isset($_SESSION['admin_id']) ? intval($_SESSION['admin_id']) : null;
 if (!$admin_id) {
-    header('location:login.php');
+    header('Location: login.php');
     exit;
 }
 
@@ -40,14 +40,15 @@ if (isset($_POST['add_blog'])) {
 
 // Delete blog
 if (isset($_GET['delete'])) {
-    $delete_id = $_GET['delete'];
+    $delete_id = intval($_GET['delete']);
     $delete_img_query = mysqli_query($conn, "SELECT image FROM `blogs` WHERE id = '$delete_id'") or die('query failed');
     $fetch_img = mysqli_fetch_assoc($delete_img_query);
     if ($fetch_img && $fetch_img['image']) {
         @unlink('uploaded_img/' . $fetch_img['image']);
     }
-    mysqli_query($conn, "DELETE FROM `blogs` WHERE id = '$delete_id'") or die('query failed');
-    header('location:admin_blogs.php');
+    mysqli_query($conn, "DELETE FROM `blogs` WHERE id = $delete_id") or die('query failed');
+    header('Location: admin_blogs.php');
+    exit;
 }
 
 // Update blog

@@ -2,12 +2,13 @@
 
 include 'config.php';
 
-session_start();
+// remove direct session_start(); and include the secure session config instead
+include_once __DIR__ . '/session_config.php';
 
-$admin_id = $_SESSION['admin_id'];
-
-if (!isset($admin_id)) {
-    header('location:login.php');
+$admin_id = isset($_SESSION['admin_id']) ? intval($_SESSION['admin_id']) : null;
+if (!$admin_id) {
+    header('Location: login.php');
+    exit;
 }
 
 // Add publisher
@@ -33,14 +34,15 @@ if (isset($_POST['add_publisher'])) {
 
 // Delete publisher
 if (isset($_GET['delete'])) {
-    $delete_id = $_GET['delete'];
+    $delete_id = intval($_GET['delete']);
     $delete_img_query = mysqli_query($conn, "SELECT profile_image FROM `publisher` WHERE id = '$delete_id'") or die('query failed');
     $fetch_img = mysqli_fetch_assoc($delete_img_query);
     if ($fetch_img && $fetch_img['profile_image']) {
         @unlink('uploaded_img/' . $fetch_img['profile_image']);
     }
-    mysqli_query($conn, "DELETE FROM `publisher` WHERE id = '$delete_id'") or die('query failed');
-    header('location:admin_publishers.php');
+    mysqli_query($conn, "DELETE FROM `publisher` WHERE id = $delete_id") or die('query failed');
+    header('Location: admin_publishers.php');
+    exit;
 }
 
 // Update publisher

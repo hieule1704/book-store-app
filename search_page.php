@@ -1,12 +1,13 @@
 <?php
 include 'config.php';
-session_start();
+// replace direct session_start() with secure session config
+include_once __DIR__ . '/session_config.php';
 
-$user_id = $_SESSION['user_id'];
-
-if (!isset($user_id)) {
-   header('location:login.php');
-   exit();
+// safe session read
+$user_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : null;
+if (!$user_id) {
+   header('Location: login.php');
+   exit;
 }
 
 if (isset($_POST['add_to_cart'])) {
