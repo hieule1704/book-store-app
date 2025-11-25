@@ -1,16 +1,25 @@
 <?php
 
 include 'config.php';
-// remove direct session_start(); and include the secure session config instead
+// Include the secure session config
 include_once __DIR__ . '/session_config.php';
 
 if (isset($_POST['submit'])) {
 
+   // 1. Sanitize inputs FIRST
+   $email = mysqli_real_escape_string($conn, $_POST['email']);
+   $pass = mysqli_real_escape_string($conn, md5($_POST['password']));
+   $remember = isset($_POST['remember']);
+
+   // 2. RUN THE QUERY (This was missing/out of order in your code)
+   $select_users = mysqli_query($conn, "SELECT * FROM `users` WHERE email = '$email' AND password = '$pass'") or die('query failed');
+
+   // 3. NOW check the rows
    if (mysqli_num_rows($select_users) > 0) {
 
       $row = mysqli_fetch_assoc($select_users);
 
-      // STRICT CHECK: Explicitly check for 1. If it's 0, NULL, or anything else, BLOCK them.
+      // STRICT CHECK: If user is NOT verified (0), block them.
       if ($row['is_verified'] != 1) {
          $message[] = 'Account not verified! Please check your email.';
       } else {
@@ -19,6 +28,7 @@ if (isset($_POST['submit'])) {
             $_SESSION['admin_name'] = $row['name'];
             $_SESSION['admin_email'] = $row['email'];
             $_SESSION['admin_id'] = $row['id'];
+
             if ($remember) {
                $token = bin2hex(random_bytes(16));
                $token_esc = mysqli_real_escape_string($conn, $token);
@@ -26,11 +36,12 @@ if (isset($_POST['submit'])) {
                setcookie('remember_token', $token, time() + (86400 * 30), "/");
             }
             header('location:admin_page.php');
-            exit; // Always exit after header redirect
+            exit;
          } elseif ($row['user_type'] == 'user') {
             $_SESSION['user_name'] = $row['name'];
             $_SESSION['user_email'] = $row['email'];
             $_SESSION['user_id'] = $row['id'];
+
             if ($remember) {
                $token = bin2hex(random_bytes(16));
                $token_esc = mysqli_real_escape_string($conn, $token);
@@ -38,7 +49,7 @@ if (isset($_POST['submit'])) {
                setcookie('remember_token', $token, time() + (86400 * 30), "/");
             }
             header('location:home.php');
-            exit; // Always exit after header redirect
+            exit;
          }
       }
    } else {
@@ -52,22 +63,10 @@ if (isset($_POST['submit'])) {
 
 <head>
    <meta charset="UTF-8">
-   <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>login</title>
-
-   <!-- Bootstrap 5.3.x CSS -->
+   <title>Login</title>
    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-   <!-- Bootstrap 5.3.x CSS -->
-   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-   <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-   <!-- custom css file link  -->
-   <!-- <link rel="stylesheet" href="css/style.css"> -->
-
 </head>
 
 <body class="bg-light" style="background: linear-gradient(135deg, #e0e7ff 0%, #fff 100%); min-height:100vh;">
@@ -97,7 +96,6 @@ if (isset($_POST['submit'])) {
 
       .login-title {
          font-weight: 700;
-         letter-spacing: 1px;
          color: #2d3a8c;
       }
 
@@ -120,11 +118,10 @@ if (isset($_POST['submit'])) {
    if (isset($message)) {
       foreach ($message as $msg) {
          echo '
-   <div class="alert alert-danger alert-dismissible fade show position-absolute top-0 start-50 translate-middle-x mt-3" role="alert" style="z-index:1050; min-width:300px;">
-      <span>' . $msg . '</span>
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-   </div>
-   ';
+         <div class="alert alert-danger alert-dismissible fade show position-absolute top-0 start-50 translate-middle-x mt-3" role="alert" style="z-index:1050; min-width:300px;">
+            <span>' . $msg . '</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+         </div>';
       }
    }
    ?>
@@ -132,9 +129,9 @@ if (isset($_POST['submit'])) {
    <div class="container d-flex align-items-center justify-content-center min-vh-100">
       <div class="login-card card p-4 fade-in" style="max-width: 400px; width: 100%;">
          <div class="text-center mb-3">
-            <img src="https://cdn-icons-png.flaticon.com/512/5087/5087579.png" alt="Login" width="64" class="mb-2" style="filter: drop-shadow(0 2px 8px #a5b4fc);">
+            <img src="https://cdn-icons-png.flaticon.com/512/5087/5087579.png" alt="Login" width="64" class="mb-2">
             <h3 class="login-title mb-1">Welcome Back!</h3>
-            <div class="desc">Sign in to your account to continue shopping and managing your orders.</div>
+            <div class="desc">Sign in to continue shopping.</div>
          </div>
          <form action="" method="post">
             <div class="form-floating mb-3">
@@ -147,9 +144,7 @@ if (isset($_POST['submit'])) {
             </div>
             <div class="form-check mb-3">
                <input class="form-check-input" type="checkbox" name="remember" id="rememberMe">
-               <label class="form-check-label" for="rememberMe">
-                  Remember me
-               </label>
+               <label class="form-check-label" for="rememberMe">Remember me</label>
             </div>
             <div class="d-grid mb-3">
                <input type="submit" name="submit" value="Login now" class="btn btn-primary btn-lg">
@@ -161,8 +156,6 @@ if (isset($_POST['submit'])) {
          </form>
       </div>
    </div>
-
-   <!-- Bootstrap 5.3.x JS Bundle -->
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

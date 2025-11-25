@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.2
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: May 19, 2025 at 08:20 AM
--- Server version: 8.4.3
--- PHP Version: 8.3.16
+-- Host: 127.0.0.1
+-- Generation Time: Nov 25, 2025 at 03:01 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -20,8 +20,6 @@ SET time_zone = "+00:00";
 --
 -- Database: `shop_db`
 --
-CREATE DATABASE IF NOT EXISTS `shop_db` DEFAULT CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci;
-USE `shop_db`;
 
 -- --------------------------------------------------------
 
@@ -30,10 +28,10 @@ USE `shop_db`;
 --
 
 CREATE TABLE `author` (
-  `id` int NOT NULL,
-  `author_name` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `profile_picture` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci DEFAULT 'No-profile-picture.jpeg'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+  `id` int(11) NOT NULL,
+  `author_name` varchar(100) NOT NULL,
+  `profile_picture` varchar(255) DEFAULT 'No-profile-picture.jpeg'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dumping data for table `author`
@@ -59,15 +57,15 @@ INSERT INTO `author` (`id`, `author_name`, `profile_picture`) VALUES
 --
 
 CREATE TABLE `blogs` (
-  `id` int NOT NULL,
-  `title` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `content` text CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `summary` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci DEFAULT NULL,
-  `image` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci DEFAULT 'other_resource/no-picture-book.jpg',
-  `author_id` int DEFAULT NULL,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+  `id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `content` text NOT NULL,
+  `summary` varchar(255) DEFAULT NULL,
+  `image` varchar(255) DEFAULT 'other_resource/no-picture-book.jpg',
+  `author_id` int(11) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dumping data for table `blogs`
@@ -86,13 +84,13 @@ INSERT INTO `blogs` (`id`, `title`, `content`, `summary`, `image`, `author_id`, 
 --
 
 CREATE TABLE `cart` (
-  `id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `name` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `price` int NOT NULL,
-  `quantity` int NOT NULL,
-  `image` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `price` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `image` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dumping data for table `cart`
@@ -100,7 +98,9 @@ CREATE TABLE `cart` (
 
 INSERT INTO `cart` (`id`, `user_id`, `name`, `price`, `quantity`, `image`) VALUES
 (5, 2, 'Atomic Habits', 20, 1, 'Atomic Habits.jpg'),
-(6, 2, 'The ONE Thing', 17, 1, 'The ONE Thing.jpg');
+(6, 2, 'The ONE Thing', 17, 1, 'The ONE Thing.jpg'),
+(9, 6, 'The Day That Turns Your Life Around', 14, 2, 'The Day that Turns Your Life Around.jpg'),
+(10, 6, 'Take Charge of Your Life: Unlocking Influence, Wealth and Potential', 16, 2, 'Take Charge of Your Life Unlocking Influence, Wealth, and Power.jpg');
 
 -- --------------------------------------------------------
 
@@ -109,13 +109,13 @@ INSERT INTO `cart` (`id`, `user_id`, `name`, `price`, `quantity`, `image`) VALUE
 --
 
 CREATE TABLE `message` (
-  `id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `name` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `email` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `number` varchar(12) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `message` varchar(500) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `number` varchar(12) NOT NULL,
+  `message` varchar(500) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -124,18 +124,18 @@ CREATE TABLE `message` (
 --
 
 CREATE TABLE `orders` (
-  `id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `name` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `number` varchar(12) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `email` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `method` varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `address` varchar(500) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `total_products` varchar(1000) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `total_price` int NOT NULL,
-  `placed_on` varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `payment_status` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL DEFAULT 'pending'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `number` varchar(12) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `method` varchar(50) NOT NULL,
+  `address` varchar(500) NOT NULL,
+  `total_products` varchar(1000) NOT NULL,
+  `total_price` int(11) NOT NULL,
+  `placed_on` varchar(50) NOT NULL,
+  `payment_status` varchar(20) NOT NULL DEFAULT 'pending'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dumping data for table `orders`
@@ -143,7 +143,22 @@ CREATE TABLE `orders` (
 
 INSERT INTO `orders` (`id`, `user_id`, `name`, `number`, `email`, `method`, `address`, `total_products`, `total_price`, `placed_on`, `payment_status`) VALUES
 (1, 2, 'HHH', '0172528523', 'huy123@gmail.com', 'credit card', 'Flat no. 25, Đường Võ Thị Sáu, Phường Mỹ Xuyên, Thành Phố Long Xuyên, Long Xuyen, Vietnam - 90000', ', The Let Them Theory (1) , The Day That Turns Your Life Around (1) ', 29, '19-May-2025', 'completed'),
-(5, 2, 'HHH', '0172528523', 'huy123@gmail.com', 'cash on delivery', 'Flat no. 25, Đường Võ Thị Sáu, Phường Mỹ Xuyên, Thành Phố Long Xuyên, Long Xuyen, Vietnam - 90000', 'Atomic Habits (1) ', 20, '19-May-2025', 'completed');
+(5, 2, 'HHH', '0172528523', 'huy123@gmail.com', 'cash on delivery', 'Flat no. 25, Đường Võ Thị Sáu, Phường Mỹ Xuyên, Thành Phố Long Xuyên, Long Xuyen, Vietnam - 90000', 'Atomic Habits (1) ', 20, '19-May-2025', 'completed'),
+(6, 6, 'Lê Chí Hiếu', '0172528523', 'lehieu17042004@gmail.com', 'cash on delivery', 'Flat no. 3, linkedin.com/in/chi-hieu-le-8b1040297, Long Xuyen, Vietnam - 90000', 'The Let Them Theory (1) , The Day That Turns Your Life Around (1) ', 29, '25-Nov-2025', 'completed');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `order_items`
+--
+
+CREATE TABLE `order_items` (
+  `id` int(11) NOT NULL,
+  `order_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `price` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -152,43 +167,44 @@ INSERT INTO `orders` (`id`, `user_id`, `name`, `number`, `email`, `method`, `add
 --
 
 CREATE TABLE `products` (
-  `id` int NOT NULL,
+  `id` int(11) NOT NULL,
   `book_name` varchar(100) NOT NULL,
-  `author_id` int NOT NULL,
-  `publisher_id` int NOT NULL,
-  `book_description` text,
+  `author_id` int(11) NOT NULL,
+  `publisher_id` int(11) NOT NULL,
+  `book_description` text DEFAULT NULL,
   `tag` varchar(100) DEFAULT NULL,
-  `publish_year` int DEFAULT NULL,
-  `total_page` int DEFAULT NULL,
-  `price` int NOT NULL,
+  `publish_year` int(11) DEFAULT NULL,
+  `total_page` int(11) DEFAULT NULL,
+  `price` int(11) NOT NULL,
+  `stock_quantity` int(11) NOT NULL DEFAULT 0,
   `image` varchar(100) NOT NULL DEFAULT 'no-picture-book.jpg'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`id`, `book_name`, `author_id`, `publisher_id`, `book_description`, `tag`, `publish_year`, `total_page`, `price`, `image`) VALUES
-(1, 'The Subtle Art of Not Giving a F*ck', 1, 2, 'A counterintuitive approach to living a good life.', 'bestseller', 2016, 224, 15, 'The Subtle Art of Not Giving a Fuck.jpg'),
-(2, 'Atomic Habits', 4, 4, 'An Easy & Proven Way to Build Good Habits & Break Bad Ones.', 'bestseller', 2018, 320, 20, 'Atomic Habits.jpg'),
-(3, 'The ONE Thing', 6, 1, 'The surprisingly simple truth behind extraordinary results.', 'bestseller', 2013, 240, 17, 'The ONE Thing.jpg'),
-(4, '12 Rules for Life', 5, 1, 'An Antidote to Chaos.', 'sales', 2018, 409, 30, '12 Rules for Life.jpg'),
-(5, 'Great Big Beautiful Life', 10, 1, 'Cuốn sách truyền cảm hứng từ Emily Henry về việc sống một cuộc đời rực rỡ, đậm sắc màu cảm xúc và sự tự do nội tâm.', 'new release', 2020, 250, 18, '5c0c42743210874ede011.jpg'),
-(6, 'One Golden Summer', 11, 3, 'A summer filled with light and unforgettable memories. Carley Fortune tells a story of love and life-changing decisions.', 'new release', 2022, 320, 20, 'One golden Summer.jpg'),
-(7, 'Warriors', 8, 2, 'A fantasy story about warrior cats, their survival, loyalty, and honor.', '', 2003, 300, 16, 'Warriors.jpg'),
-(8, 'The Wager', 10, 1, 'David Grann recounts a remarkable survival journey at sea, betrayal, and extraordinary willpower.', 'new release', 2023, 288, 31, 'The wager.jpg'),
-(9, 'Don’t Believe Everything You Think', 3, 2, 'Joseph Nguyen explains how the mind creates suffering and how to live more peacefully by not believing every thought.', 'bestseller', 2022, 160, 12, 'Dont belie everything you think.jpg'),
-(10, 'Beyond Thoughts', 3, 2, 'A deep look into presence and how to transcend negative thinking for inner peace.', 'bestseller', 2020, 170, 14, 'Beyond thoughts.jpg'),
-(11, 'Bí quyết thành công ở đại học', 7, 6, 'Tim Vũ shares practical strategies for effective learning and building a career from the university years.', '', 2019, 200, 10, 'Bí quyết thành công ở đại học.jpg'),
-(12, 'The Overthinker’s Guide to Making Decisions', 3, 4, 'A guide for overthinkers on simplifying decisions, reducing anxiety, and taking effective action.', 'new release', 2023, 160, 13, 'The overthinker guide to making decision.jpg'),
-(13, 'Boundaries = Freedom', 3, 4, 'Setting boundaries is the first step to personal freedom, life control, and healthier relationships.', 'bestseller', 2020, 160, 13, 'Boundaries equal freedom.jpg'),
-(14, 'Models: Attract Women Through Honesty', 1, 1, 'Mark Manson explores how to become more attractive through honesty, self-improvement, and real value.', 'bestseller', 2020, 280, 13, 'Models Attract Women Through Honesty.jpg'),
-(15, 'Take Charge of Your Life: Unlocking Influence, Wealth and Potential', 8, 5, 'Jim Rohn shares timeless principles for mastering life, cultivating positive thinking, and achieving personal success.', 'classic', 1985, 150, 16, 'Take Charge of Your Life Unlocking Influence, Wealth, and Power.jpg'),
-(16, 'The 5 Second Rule', 2, 2, 'Mel Robbins presents a simple method to take action, overcome procrastination, and build confidence in 5 seconds.', 'bestseller', 2017, 240, 18, 'The 5 second rule.jpg'),
-(17, 'The Compound Effect', 9, 5, 'Darren Hardy emphasizes how small consistent actions lead to extraordinary success over time.', 'bestseller', 2017, 240, 18, 'The Compound Effect.jpg'),
-(18, 'The Day That Turns Your Life Around', 8, 3, 'Jim Rohn shares stories about turning points in life and how we can create our own breakthroughs.', 'classic', 1993, 130, 14, 'The Day that Turns Your Life Around.jpg'),
-(19, 'The Let Them Theory', 2, 1, 'Mel Robbins introduces the “Let Them” theory to reduce stress and live according to your own values.', 'new release', 2023, 180, 15, 'The let them theory.jpg'),
-(20, 'The Power of Ambition', 8, 1, 'Jim Rohn inspires readers to pursue ambition, set goals, and stay committed to success.', '', 1994, 140, 15, 'The Power of Ambition.jpg');
+INSERT INTO `products` (`id`, `book_name`, `author_id`, `publisher_id`, `book_description`, `tag`, `publish_year`, `total_page`, `price`, `stock_quantity`, `image`) VALUES
+(1, 'The Subtle Art of Not Giving a F*ck', 1, 2, 'A counterintuitive approach to living a good life.', 'bestseller', 2016, 224, 15, 0, 'The Subtle Art of Not Giving a Fuck.jpg'),
+(2, 'Atomic Habits', 4, 4, 'An Easy & Proven Way to Build Good Habits & Break Bad Ones.', 'bestseller', 2018, 320, 20, 0, 'Atomic Habits.jpg'),
+(3, 'The ONE Thing', 6, 1, 'The surprisingly simple truth behind extraordinary results.', 'bestseller', 2013, 240, 17, 0, 'The ONE Thing.jpg'),
+(4, '12 Rules for Life', 5, 1, 'An Antidote to Chaos.', 'sales', 2018, 409, 30, 0, '12 Rules for Life.jpg'),
+(5, 'Great Big Beautiful Life', 10, 1, 'Cuốn sách truyền cảm hứng từ Emily Henry về việc sống một cuộc đời rực rỡ, đậm sắc màu cảm xúc và sự tự do nội tâm.', 'new release', 2020, 250, 18, 0, '5c0c42743210874ede011.jpg'),
+(6, 'One Golden Summer', 11, 3, 'A summer filled with light and unforgettable memories. Carley Fortune tells a story of love and life-changing decisions.', 'new release', 2022, 320, 20, 0, 'One golden Summer.jpg'),
+(7, 'Warriors', 8, 2, 'A fantasy story about warrior cats, their survival, loyalty, and honor.', '', 2003, 300, 16, 0, 'Warriors.jpg'),
+(8, 'The Wager', 10, 1, 'David Grann recounts a remarkable survival journey at sea, betrayal, and extraordinary willpower.', 'new release', 2023, 288, 31, 0, 'The wager.jpg'),
+(9, 'Don’t Believe Everything You Think', 3, 2, 'Joseph Nguyen explains how the mind creates suffering and how to live more peacefully by not believing every thought.', 'bestseller', 2022, 160, 12, 0, 'Dont belie everything you think.jpg'),
+(10, 'Beyond Thoughts', 3, 2, 'A deep look into presence and how to transcend negative thinking for inner peace.', 'bestseller', 2020, 170, 14, 0, 'Beyond thoughts.jpg'),
+(11, 'Bí quyết thành công ở đại học', 7, 6, 'Tim Vũ shares practical strategies for effective learning and building a career from the university years.', '', 2019, 200, 10, 0, 'Bí quyết thành công ở đại học.jpg'),
+(12, 'The Overthinker’s Guide to Making Decisions', 3, 4, 'A guide for overthinkers on simplifying decisions, reducing anxiety, and taking effective action.', 'new release', 2023, 160, 13, 0, 'The overthinker guide to making decision.jpg'),
+(13, 'Boundaries = Freedom', 3, 4, 'Setting boundaries is the first step to personal freedom, life control, and healthier relationships.', 'bestseller', 2020, 160, 13, 0, 'Boundaries equal freedom.jpg'),
+(14, 'Models: Attract Women Through Honesty', 1, 1, 'Mark Manson explores how to become more attractive through honesty, self-improvement, and real value.', 'bestseller', 2020, 280, 13, 0, 'Models Attract Women Through Honesty.jpg'),
+(15, 'Take Charge of Your Life: Unlocking Influence, Wealth and Potential', 8, 5, 'Jim Rohn shares timeless principles for mastering life, cultivating positive thinking, and achieving personal success.', 'classic', 1985, 150, 16, 0, 'Take Charge of Your Life Unlocking Influence, Wealth, and Power.jpg'),
+(16, 'The 5 Second Rule', 2, 2, 'Mel Robbins presents a simple method to take action, overcome procrastination, and build confidence in 5 seconds.', 'bestseller', 2017, 240, 18, 0, 'The 5 second rule.jpg'),
+(17, 'The Compound Effect', 9, 5, 'Darren Hardy emphasizes how small consistent actions lead to extraordinary success over time.', 'bestseller', 2017, 240, 18, 0, 'The Compound Effect.jpg'),
+(18, 'The Day That Turns Your Life Around', 8, 3, 'Jim Rohn shares stories about turning points in life and how we can create our own breakthroughs.', 'classic', 1993, 130, 14, 0, 'The Day that Turns Your Life Around.jpg'),
+(19, 'The Let Them Theory', 2, 1, 'Mel Robbins introduces the “Let Them” theory to reduce stress and live according to your own values.', 'new release', 2023, 180, 15, 0, 'The let them theory.jpg'),
+(20, 'The Power of Ambition', 8, 1, 'Jim Rohn inspires readers to pursue ambition, set goals, and stay committed to success.', '', 1994, 140, 15, 0, 'The Power of Ambition.jpg');
 
 -- --------------------------------------------------------
 
@@ -197,10 +213,10 @@ INSERT INTO `products` (`id`, `book_name`, `author_id`, `publisher_id`, `book_de
 --
 
 CREATE TABLE `publisher` (
-  `id` int NOT NULL,
-  `publisher_name` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `profile_image` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci DEFAULT 'No-profile-picture.jpeg'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+  `id` int(11) NOT NULL,
+  `publisher_name` varchar(100) NOT NULL,
+  `profile_image` varchar(255) DEFAULT 'No-profile-picture.jpeg'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dumping data for table `publisher`
@@ -221,22 +237,31 @@ INSERT INTO `publisher` (`id`, `publisher_name`, `profile_image`) VALUES
 --
 
 CREATE TABLE `users` (
-  `id` int NOT NULL,
-  `name` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `email` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `password` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `user_type` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL DEFAULT 'user'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `password` varchar(100) NOT NULL,
+  `verification_code` varchar(255) DEFAULT NULL,
+  `is_verified` tinyint(1) NOT NULL DEFAULT 0,
+  `remember_token` varchar(128) DEFAULT NULL,
+  `user_type` varchar(20) NOT NULL DEFAULT 'user'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `email`, `password`, `user_type`) VALUES
-(1, 'Lê Chí Hiếu', 'hieu123@gmail.com', '202cb962ac59075b964b07152d234b70', 'admin'),
-(2, 'Huỳnh Hà Huy', 'huy123@gmail.com', '202cb962ac59075b964b07152d234b70', 'user'),
-(3, 'Hiếu LC', 'lehieu17042004@gmail.com', '', 'user'),
-(4, 'CHAT BOT GPT 1', 'gpt1704.1@gmail.com', '', 'user');
+INSERT INTO `users` (`id`, `name`, `email`, `password`, `verification_code`, `is_verified`, `remember_token`, `user_type`) VALUES
+(1, 'Lê Chí Hiếu', 'hieu123@gmail.com', '202cb962ac59075b964b07152d234b70', NULL, 1, 'c97952fc03863abcd6796140239470b5', 'admin'),
+(2, 'Huỳnh Hà Huy', 'huy123@gmail.com', '202cb962ac59075b964b07152d234b70', NULL, 0, NULL, 'user'),
+(3, 'Hiếu LC', 'lehieu17042004@gmail.com', '', NULL, 0, NULL, 'user'),
+(4, 'CHAT BOT GPT 1', 'gpt1704.1@gmail.com', '', NULL, 0, NULL, 'user'),
+(6, 'test1', 'test1@gmail.com', '202cb962ac59075b964b07152d234b70', NULL, 0, NULL, 'user'),
+(7, 'Hoc CooHom', 'hoccoohom@gmail.com', '', NULL, 1, NULL, 'user'),
+(8, 'CHAT BOT GPT 2', 'gpt1704.2@gmail.com', '', NULL, 1, NULL, 'user'),
+(9, 'Hiếu Lê Chí', 'lchieu1704@gmail.com', '', NULL, 0, NULL, 'user'),
+(10, 'Ethan Lee', 'ethlee1704@gmail.com', '', NULL, 1, NULL, 'user'),
+(11, 'Hieu AGU', 'hieu_dth225642@student.agu.edu.vn', '202cb962ac59075b964b07152d234b70', NULL, 1, NULL, 'user');
 
 --
 -- Indexes for dumped tables
@@ -277,6 +302,14 @@ ALTER TABLE `orders`
   ADD KEY `user_id` (`user_id`);
 
 --
+-- Indexes for table `order_items`
+--
+ALTER TABLE `order_items`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `order_id` (`order_id`),
+  ADD KEY `product_id` (`product_id`);
+
+--
 -- Indexes for table `products`
 --
 ALTER TABLE `products`
@@ -304,49 +337,55 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `author`
 --
 ALTER TABLE `author`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `blogs`
 --
 ALTER TABLE `blogs`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `message`
 --
 ALTER TABLE `message`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `order_items`
+--
+ALTER TABLE `order_items`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `publisher`
 --
 ALTER TABLE `publisher`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- Constraints for dumped tables
@@ -375,6 +414,13 @@ ALTER TABLE `message`
 --
 ALTER TABLE `orders`
   ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `order_items`
+--
+ALTER TABLE `order_items`
+  ADD CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`);
 
 --
 -- Constraints for table `products`
