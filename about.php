@@ -21,138 +21,199 @@ if (!$user_id) {
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>About</title>
+   <title>About Us</title>
 
    <!-- Bootstrap 5.3.x CSS -->
    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-   <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+   <link rel="stylesheet" href="style.css">
+
+   <style>
+      .feature-icon {
+         width: 60px;
+         height: 60px;
+         background: rgba(13, 110, 253, 0.1);
+         color: #0d6efd;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         border-radius: 50%;
+         font-size: 1.5rem;
+         margin-bottom: 1rem;
+      }
+
+      .review-card {
+         transition: transform 0.3s;
+         border: 1px solid rgba(0, 0, 0, 0.05);
+      }
+
+      .review-card:hover {
+         transform: translateY(-5px);
+         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
+      }
+
+      .stat-box {
+         border-right: 1px solid #dee2e6;
+      }
+
+      .stat-box:last-child {
+         border-right: none;
+      }
+   </style>
 
 </head>
 
-<body>
+<body class="bg-light">
 
    <?php include 'header.php'; ?>
 
-   <div class="bg-light py-4 mb-4">
+   <!-- Header Banner -->
+   <div class="bg-dark py-5 text-white text-center" style="background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('images/about-bg.jpg') center/cover;">
       <div class="container">
-         <h3 class="mb-1">About us</h3>
+         <h1 class="fw-bold display-5">Our Story</h1>
          <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-0">
-               <li class="breadcrumb-item"><a href="home.php">Home</a></li>
-               <li class="breadcrumb-item active" aria-current="page">About</li>
+            <ol class="breadcrumb justify-content-center mb-0">
+               <li class="breadcrumb-item"><a href="home.php" class="text-white-50 text-decoration-none">Home</a></li>
+               <li class="breadcrumb-item active text-white" aria-current="page">About</li>
             </ol>
          </nav>
       </div>
    </div>
 
-   <!-- About Section with better image handling -->
+   <!-- About Section -->
    <section class="container py-5">
-      <div class="row align-items-center flex-lg-row flex-column-reverse">
+      <div class="row align-items-center g-5">
          <div class="col-lg-6">
-            <h3 class="fw-bold mb-3">Why choose us?</h3>
-            <p>We offer a carefully curated selection of books, fast and reliable delivery, and a passion for helping readers find their next favorite read. Your satisfaction is our top priority.</p>
-            <p>With a user-friendly website and dedicated customer support, we make your book-buying experience easy, enjoyable, and trustworthy.</p>
-            <a href="contact.php" class="btn btn-primary">Contact us</a>
+            <div class="position-relative">
+               <img src="images/about-img.jpg" alt="About us" class="img-fluid rounded-4 shadow-lg w-100">
+               <div class="position-absolute bottom-0 end-0 bg-white p-4 rounded-top-4 shadow d-none d-md-block" style="margin-right: -20px; margin-bottom: -20px;">
+                  <h2 class="fw-bold text-primary mb-0">10+</h2>
+                  <small class="text-muted">Years Experience</small>
+               </div>
+            </div>
          </div>
-         <div class="col-lg-6 mb-4 mb-lg-0 d-flex justify-content-center">
-            <div class="ratio ratio-4x3 rounded shadow overflow-hidden" style="max-width: 450px; width: 100%;">
-               <img src="images/about-img.jpg" alt="About us" class="object-fit-cover w-100 h-100">
+         <div class="col-lg-6">
+            <h6 class="text-primary fw-bold text-uppercase">Who We Are</h6>
+            <h2 class="fw-bold mb-4 display-6">We Provide the Best Books for You to Read.</h2>
+            <p class="lead text-muted mb-4">We believe that books have the power to change lives. Our mission is to make knowledge and stories accessible to everyone, everywhere.</p>
+
+            <div class="row g-4 mb-4">
+               <div class="col-sm-6">
+                  <div class="d-flex align-items-start">
+                     <i class="fas fa-check-circle text-success fs-4 me-3 mt-1"></i>
+                     <div>
+                        <h6 class="fw-bold mb-1">Curated Selection</h6>
+                        <p class="small text-muted mb-0">Only the best titles make it to our shelves.</p>
+                     </div>
+                  </div>
+               </div>
+               <div class="col-sm-6">
+                  <div class="d-flex align-items-start">
+                     <i class="fas fa-check-circle text-success fs-4 me-3 mt-1"></i>
+                     <div>
+                        <h6 class="fw-bold mb-1">Fast Delivery</h6>
+                        <p class="small text-muted mb-0">Get your books delivered in record time.</p>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <a href="contact.php" class="btn btn-primary btn-lg px-4 rounded-pill">Get in Touch</a>
+         </div>
+      </div>
+   </section>
+
+   <!-- Stats Section -->
+   <section class="bg-white py-5 border-top border-bottom">
+      <div class="container">
+         <div class="row text-center g-4">
+            <div class="col-md-3 col-6 stat-box">
+               <h2 class="fw-bold text-primary">15k+</h2>
+               <p class="text-muted mb-0">Books Sold</p>
+            </div>
+            <div class="col-md-3 col-6 stat-box">
+               <h2 class="fw-bold text-primary">12k+</h2>
+               <p class="text-muted mb-0">Happy Readers</p>
+            </div>
+            <div class="col-md-3 col-6 stat-box">
+               <h2 class="fw-bold text-primary">500+</h2>
+               <p class="text-muted mb-0">Authors</p>
+            </div>
+            <div class="col-md-3 col-6 stat-box">
+               <h2 class="fw-bold text-primary">50+</h2>
+               <p class="text-muted mb-0">Awards Won</p>
+            </div>
+         </div>
+      </div>
+   </section>
+
+   <!-- Features Section -->
+   <section class="container py-5">
+      <div class="row g-4 text-center">
+         <div class="col-md-4">
+            <div class="p-4 bg-white rounded shadow-sm h-100">
+               <div class="feature-icon mx-auto"><i class="fas fa-truck"></i></div>
+               <h5 class="fw-bold">Free Shipping</h5>
+               <p class="text-muted small">Order over $250 and get free shipping anywhere in the country.</p>
+            </div>
+         </div>
+         <div class="col-md-4">
+            <div class="p-4 bg-white rounded shadow-sm h-100">
+               <div class="feature-icon mx-auto"><i class="fas fa-lock"></i></div>
+               <h5 class="fw-bold">Secure Payment</h5>
+               <p class="text-muted small">100% secure payment with SSL encryption and trusted gateways.</p>
+            </div>
+         </div>
+         <div class="col-md-4">
+            <div class="p-4 bg-white rounded shadow-sm h-100">
+               <div class="feature-icon mx-auto"><i class="fas fa-headset"></i></div>
+               <h5 class="fw-bold">24/7 Support</h5>
+               <p class="text-muted small">Our dedicated support team is here to help you anytime.</p>
             </div>
          </div>
       </div>
    </section>
 
    <!-- Client Reviews Section -->
-   <section class="container py-5">
-      <h1 class="text-center text-uppercase mb-4">Client's reviews</h1>
+   <section class="container py-5 mb-5">
+      <div class="text-center mb-5">
+         <h6 class="text-primary fw-bold text-uppercase">Testimonials</h6>
+         <h2 class="fw-bold">What Our Readers Say</h2>
+      </div>
       <div class="row g-4">
          <?php
          $reviews = [
             [
                "img" => "images/pic-1.png",
-               "text" => "I’ve been buying books online for years, but this bookstore has truly impressed me. The site is easy to navigate, the selection is excellent, and my order arrived faster than expected. The books were packaged carefully, and even included a small thank-you note — such a thoughtful touch! I’ll definitely be coming back for more.",
+               "text" => "The selection is excellent, and my order arrived faster than expected. The books were packaged carefully.",
                "name" => "Ethan Lee"
             ],
             [
                "img" => "images/pic-2.png",
-               "text" => "As someone who reads a lot, I really appreciate how well-organized this store is. It was easy to find what I was looking for, and I even discovered a few new titles I hadn’t heard of. My only suggestion would be to add more options in the fantasy genre, but other than that, everything was smooth. Great service and good prices!",
+               "text" => "I discovered a few new titles I hadn’t heard of. Great service and good prices! Highly recommended.",
                "name" => "Elisa Poet"
             ],
             [
                "img" => "images/pic-3.png",
-               "text" => "What really stood out to me was the customer support. I accidentally ordered the wrong book and contacted the store. They responded within an hour and helped me fix it right away. The book I needed was delivered on time, and they even followed up to make sure I was satisfied. That kind of service is rare these days!",
+               "text" => "Customer support responded within an hour and helped me fix my order right away. Rare service these days!",
                "name" => "Jim Rohn"
-            ],
-            [
-               "img" => "images/pic-4.png",
-               "text" => "I love everything about this bookstore — from the minimalist design of the website to the wide range of categories. I’m a parent and often buy books for my kids, and they always have great children’s options available. Plus, their educational and self-help sections are full of hidden gems.",
-               "name" => "Ariana Grande"
-            ],
-            [
-               "img" => "images/pic-5.png",
-               "text" => "Honestly, I was skeptical at first because I hadn’t heard of this site before. But I’m so glad I gave it a try. I ordered three books and they all arrived in great condition. The prices were better than what I found on bigger platforms, and I liked supporting a more personal business. I’ll definitely recommend it to friends.",
-               "name" => "Mark Manson"
-            ],
-            [
-               "img" => "images/pic-6.png",
-               "text" => "This bookstore has helped me fall in love with reading again. I used to struggle finding books that suited my taste, but their recommendations were spot on. The site feels curated and personal, not just another huge online retailer. I’ve already placed my second order and can’t wait for my next book haul!",
-               "name" => "Thảo Ngọc"
             ]
          ];
          foreach ($reviews as $review) {
          ?>
-            <div class="col-md-6 col-lg-4">
-               <div class="card h-100 shadow border-0">
-                  <div class="d-flex justify-content-center pt-4">
-                     <img src="<?php echo $review['img']; ?>" alt="" class="rounded-circle shadow" style="width: 90px; height: 90px; object-fit: cover;">
-                  </div>
+            <div class="col-md-4">
+               <div class="card h-100 border-0 shadow-sm review-card p-3 text-center">
                   <div class="card-body">
-                     <p class="card-text"><?php echo $review['text']; ?></p>
-                     <div class="mb-2 text-warning">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
+                     <div class="mb-3 text-warning">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
                      </div>
-                     <h6 class="fw-bold mb-0 text-center"><?php echo $review['name']; ?></h6>
-                  </div>
-               </div>
-            </div>
-         <?php } ?>
-      </div>
-   </section>
-
-   <!-- Great Authors Section with improved image grid -->
-   <section class="container py-5">
-      <h1 class="text-center text-uppercase mb-4">Great authors</h1>
-      <div class="row g-4 justify-content-center">
-         <?php
-         $authors = [
-            ["img" => "images/author-1.jpg", "name" => "Jordan Peterson"],
-            ["img" => "images/author-2.jpg", "name" => "Mel Robbins"],
-            ["img" => "images/author-3.jpg", "name" => "Joseph Nguyen"],
-            ["img" => "images/author-4.jpg", "name" => "The Present Writer"],
-            ["img" => "images/author-5.jpg", "name" => "Tim Vu"],
-            ["img" => "images/author-6.jpg", "name" => "Barbara Oakley"]
-         ];
-         foreach ($authors as $author) {
-         ?>
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-               <div class="card h-100 text-center shadow border-0 p-3">
-                  <div class="d-flex justify-content-center pt-3">
-                     <img src="<?php echo $author['img']; ?>" alt="" class="rounded-circle border border-4 border-primary shadow" style="width: 150px; height: 150px; object-fit: cover;">
-                  </div>
-                  <div class="card-body p-2">
-                     <div class="mb-3 d-flex justify-content-center gap-3 fs-4">
-                        <a href="#" class="text-secondary"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="text-secondary"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="text-secondary"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-secondary"><i class="fab fa-linkedin"></i></a>
+                     <p class="card-text text-muted fst-italic">"<?php echo $review['text']; ?>"</p>
+                     <div class="d-flex justify-content-center align-items-center mt-4">
+                        <img src="<?php echo $review['img']; ?>" class="rounded-circle shadow-sm me-3" width="50" height="50">
+                        <div class="text-start">
+                           <h6 class="fw-bold mb-0"><?php echo $review['name']; ?></h6>
+                           <small class="text-muted">Verified Buyer</small>
+                        </div>
                      </div>
-                     <h5 class="fw-bold mb-0"><?php echo $author['name']; ?></h5>
                   </div>
                </div>
             </div>

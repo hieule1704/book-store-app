@@ -21,64 +21,125 @@ if (!$user_id) {
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>orders</title>
+   <title>My Orders</title>
 
    <!-- Bootstrap 5.3.x CSS -->
    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-   <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+   <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="bg-light">
 
    <?php include 'header.php'; ?>
 
-   <div class="bg-light py-4 mb-4">
+   <div class="bg-primary py-5 mb-5 text-white text-center">
       <div class="container">
-         <h3 class="mb-1">Your orders</h3>
-         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-0">
-               <li class="breadcrumb-item"><a href="home.php">Home</a></li>
-               <li class="breadcrumb-item active" aria-current="page">Orders</li>
-            </ol>
-         </nav>
+         <h1 class="fw-bold display-5">My Orders</h1>
+         <p class="lead">Track your past and current purchases.</p>
       </div>
    </div>
 
-   <section class="container py-5">
-      <h1 class="text-center text-uppercase mb-4">Placed orders</h1>
-      <div class="row g-4">
-         <?php
-         $order_query = mysqli_query($conn, "SELECT * FROM `orders` WHERE user_id = '$user_id'") or die('query failed');
-         if (mysqli_num_rows($order_query) > 0) {
-            while ($fetch_orders = mysqli_fetch_assoc($order_query)) {
-         ?>
-               <div class="col-md-6 col-lg-4">
-                  <div class="card shadow h-100">
-                     <div class="card-body">
-                        <p class="mb-1"><strong>Placed on:</strong> <span><?php echo $fetch_orders['placed_on']; ?></span></p>
-                        <p class="mb-1"><strong>Name:</strong> <span><?php echo $fetch_orders['name']; ?></span></p>
-                        <p class="mb-1"><strong>Number:</strong> <span><?php echo $fetch_orders['number']; ?></span></p>
-                        <p class="mb-1"><strong>Email:</strong> <span><?php echo $fetch_orders['email']; ?></span></p>
-                        <p class="mb-1"><strong>Address:</strong> <span><?php echo $fetch_orders['address']; ?></span></p>
-                        <p class="mb-1"><strong>Payment method:</strong> <span><?php echo $fetch_orders['method']; ?></span></p>
-                        <p class="mb-1"><strong>Your orders:</strong> <span><?php echo $fetch_orders['total_products']; ?></span></p>
-                        <p class="mb-1"><strong>Total price:</strong> <span class="text-danger fw-bold">$<?php echo $fetch_orders['total_price']; ?>/-</span></p>
-                        <p class="mb-0"><strong>Payment status:</strong>
-                           <span class="<?php echo ($fetch_orders['payment_status'] == 'pending') ? 'text-danger' : 'text-success'; ?>">
+   <section class="container mb-5">
+      <div class="row justify-content-center">
+         <div class="col-lg-10">
+            <?php
+            $order_query = mysqli_query($conn, "SELECT * FROM `orders` WHERE user_id = '$user_id' ORDER BY id DESC") or die('query failed');
+
+            if (mysqli_num_rows($order_query) > 0) {
+               while ($fetch_orders = mysqli_fetch_assoc($order_query)) {
+                  $order_id = $fetch_orders['id'];
+                  $statusClass = ($fetch_orders['payment_status'] == 'completed') ? 'bg-success' : 'bg-warning text-dark';
+            ?>
+                  <div class="card shadow-sm border-0 mb-4 overflow-hidden">
+                     <div class="card-header bg-white p-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                           <span class="text-muted small text-uppercase fw-bold">Order Placed</span><br>
+                           <span class="fw-bold"><?php echo $fetch_orders['placed_on']; ?></span>
+                        </div>
+                        <div>
+                           <span class="text-muted small text-uppercase fw-bold">Total</span><br>
+                           <span class="fw-bold text-primary">$<?php echo number_format($fetch_orders['total_price']); ?></span>
+                        </div>
+                        <div>
+                           <span class="text-muted small text-uppercase fw-bold">Order #</span><br>
+                           <span><?php echo $order_id; ?></span>
+                        </div>
+                        <div class="ms-md-auto">
+                           <span class="badge <?php echo $statusClass; ?> px-3 py-2 rounded-pill text-uppercase">
                               <?php echo $fetch_orders['payment_status']; ?>
                            </span>
-                        </p>
+                        </div>
                      </div>
+
+                     <div class="card-body p-4">
+                        <div class="row">
+                           <div class="col-md-8">
+                              <h6 class="fw-bold mb-3 border-bottom pb-2">Items Ordered</h6>
+
+                              <!-- FETCH ITEMS DYNAMICALLY FROM ORDER_ITEMS TABLE -->
+                              <?php
+                              // Check if order_items table exists and has data for this order
+                              // Use a JOIN to get product images and names
+                              $items_query = mysqli_query($conn, "
+                              SELECT oi.*, p.image, p.book_name 
+                              FROM `order_items` oi 
+                              JOIN `products` p ON oi.product_id = p.id 
+                              WHERE oi.order_id = '$order_id'
+                           ");
+
+                              if (mysqli_num_rows($items_query) > 0) {
+                                 // NEW WAY: Show list with images
+                                 while ($item = mysqli_fetch_assoc($items_query)) {
+                              ?>
+                                    <div class="d-flex align-items-center mb-3">
+                                       <img src="uploaded_img/<?php echo $item['image']; ?>" class="rounded border me-3" style="width: 60px; height: 80px; object-fit: cover;" alt="Book">
+                                       <div>
+                                          <h6 class="mb-1 fw-bold"><a href="detail.php?id=<?php echo $item['product_id']; ?>" class="text-decoration-none text-dark"><?php echo $item['book_name']; ?></a></h6>
+                                          <div class="text-muted small">
+                                             Quantity: <?php echo $item['quantity']; ?> &times; $<?php echo $item['price']; ?>
+                                          </div>
+                                       </div>
+                                    </div>
+                              <?php
+                                 }
+                              } else {
+                                 // FALLBACK: Old text string method if migration isn't fully applied to old orders
+                                 echo '<p class="text-muted">' . $fetch_orders['total_products'] . '</p>';
+                              }
+                              ?>
+                           </div>
+
+                           <div class="col-md-4 border-start ps-md-4 mt-4 mt-md-0">
+                              <h6 class="fw-bold mb-3 border-bottom pb-2">Delivery Details</h6>
+                              <p class="mb-1"><strong>Name:</strong> <?php echo $fetch_orders['name']; ?></p>
+                              <p class="mb-1"><strong>Phone:</strong> <?php echo $fetch_orders['number']; ?></p>
+                              <p class="mb-1"><strong>Address:</strong> <br><span class="text-muted small"><?php echo $fetch_orders['address']; ?></span></p>
+                              <p class="mb-0"><strong>Method:</strong> <?php echo $fetch_orders['method']; ?></p>
+                           </div>
+                        </div>
+                     </div>
+
+                     <?php if ($fetch_orders['payment_status'] == 'completed'): ?>
+                        <div class="card-footer bg-light p-3 text-end">
+                           <a href="contact.php" class="btn btn-sm btn-outline-secondary">Need Help?</a>
+                           <button class="btn btn-sm btn-primary ms-2">Buy Again</button>
+                        </div>
+                     <?php endif; ?>
                   </div>
-               </div>
-         <?php
+            <?php
+               }
+            } else {
+               echo '
+               <div class="text-center py-5">
+                  <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
+                  <h3>No orders yet</h3>
+                  <p class="text-muted">Looks like you haven\'t placed any orders yet.</p>
+                  <a href="shop.php" class="btn btn-primary mt-2">Start Shopping</a>
+               </div>';
             }
-         } else {
-            echo '<div class="col-12"><div class="alert alert-info text-center">No orders placed yet!</div></div>';
-         }
-         ?>
+            ?>
+         </div>
       </div>
    </section>
 

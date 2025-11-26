@@ -401,20 +401,6 @@ if (isset($_POST['more_detail'])) {
             });
       });
 
-      // Simple Countdown Script (keep)
-      let time = (2 * 3600) + (15 * 60) + 30;
-      setInterval(() => {
-         let h = Math.floor(time / 3600);
-         let m = Math.floor((time % 3600) / 60);
-         let s = time % 60;
-         h = h < 10 ? '0' + h : h;
-         m = m < 10 ? '0' + m : m;
-         s = s < 10 ? '0' + s : s;
-         document.getElementById('countdown').innerText = `${h}:${m}:${s}`;
-         if (time > 0) time--;
-         else time = 7200;
-      }, 1000);
-
       // FEATURE 4: DARK MODE LOGIC
       function toggleTheme() {
          const body = document.body;
