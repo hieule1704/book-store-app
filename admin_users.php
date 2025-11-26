@@ -87,6 +87,11 @@ if (isset($_GET['delete'])) {
 
    <section class="container my-5">
       <h1 class="text-center text-uppercase mb-4">User Accounts</h1>
+      <div class="text-end mb-3">
+         <a href="admin_export.php?table=users" class="btn btn-success">
+            <i class="fas fa-file-download me-2"></i> Export Messages
+         </a>
+      </div>
       <div class="row g-4">
          <?php
          $select_users = mysqli_query($conn, "SELECT * FROM `users`") or die('query failed');

@@ -1,4 +1,14 @@
 <?php
+// Load Composer's autoloader
+require 'vendor/autoload.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+use Dotenv\Dotenv;
+
+// Load .env variables
+$dotenv = Dotenv::createImmutable(__DIR__);
+$dotenv->load();
 
 include 'config.php';
 
@@ -19,13 +29,58 @@ if (isset($_POST['send'])) {
    $number = $_POST['number'];
    $msg = mysqli_real_escape_string($conn, $_POST['message']);
 
+   // Check for duplicate message in DB
    $select_message = mysqli_query($conn, "SELECT * FROM `message` WHERE name = '$name' AND email = '$email' AND number = '$number' AND message = '$msg'") or die('query failed');
 
    if (mysqli_num_rows($select_message) > 0) {
       $message[] = 'Message sent already!';
    } else {
-      mysqli_query($conn, "INSERT INTO `message`(user_id, name, email, number, message) VALUES('$user_id', '$name', '$email', '$number', '$msg')") or die('query failed');
-      $message[] = 'Message sent successfully!';
+      // 1. Insert into Database
+      $insert = mysqli_query($conn, "INSERT INTO `message`(user_id, name, email, number, message) VALUES('$user_id', '$name', '$email', '$number', '$msg')");
+
+      if ($insert) {
+         // 2. Send Email Notification to Admin
+         $mail = new PHPMailer(true);
+
+         try {
+            // Server settings
+            $mail->isSMTP();
+            $mail->Host       = $_ENV['SMTP_HOST'];
+            $mail->SMTPAuth   = true;
+            $mail->Username   = $_ENV['SMTP_USER']; // Your Gmail
+            $mail->Password   = $_ENV['SMTP_PASS']; // App Password
+            $mail->SMTPSecure = $_ENV['SMTP_SECURE']; // tls
+            $mail->Port       = $_ENV['SMTP_PORT'];    // 587
+
+            // Sender & Recipient
+            // Note: For Gmail SMTP, the 'From' address usually must match the authenticated user
+            $mail->setFrom($_ENV['SMTP_USER'], 'Bookly Contact Form');
+            $mail->addAddress($_ENV['SMTP_USER']); // Send TO yourself (Admin)
+            // Optional: Add Reply-To so you can reply directly to the customer
+            $mail->addReplyTo($email, $name);
+
+            // Content
+            $mail->isHTML(true);
+            $mail->Subject = "New Contact Message from $name";
+
+            $mail->Body    = "
+               <h3>New User Message</h3>
+               <p><strong>Name:</strong> $name</p>
+               <p><strong>Email:</strong> $email</p>
+               <p><strong>Phone:</strong> $number</p>
+               <hr>
+               <p><strong>Message:</strong><br>$msg</p>
+            ";
+
+            $mail->send();
+            $message[] = 'Message sent successfully and emailed to admin!';
+         } catch (Exception $e) {
+            // If email fails, at least it's in the database.
+            $message[] = 'Message saved to database, but email notification failed. Error: ' . $mail->ErrorInfo;
+         }
+      } else {
+         $message[] = 'Failed to send message!';
+      }
    }
 }
 
@@ -197,6 +252,7 @@ if (isset($_POST['send'])) {
 
    <?php include 'footer.php'; ?>
 
+   <!-- Bootstrap 5.3.x JS Bundle -->
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>

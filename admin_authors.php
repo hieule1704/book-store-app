@@ -86,6 +86,7 @@ if (isset($_POST['update_author'])) {
 
     <section class="container my-5">
         <h1 class="text-center text-uppercase mb-4">Manage Authors</h1>
+
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <div class="card shadow mb-4">
@@ -105,6 +106,11 @@ if (isset($_POST['update_author'])) {
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="text-end mb-3">
+            <a href="admin_export.php?table=author" class="btn btn-success">
+                <i class="fas fa-file-download me-2"></i> Export Messages
+            </a>
         </div>
     </section>
 

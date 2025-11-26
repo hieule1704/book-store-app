@@ -148,6 +148,11 @@ if (isset($_POST['update_blog'])) {
                 </div>
             </div>
         </div>
+        <div class="text-end mb-3">
+            <a href="admin_export.php?table=blogs" class="btn btn-success">
+                <i class="fas fa-file-download me-2"></i> Export Messages
+            </a>
+        </div>
     </section>
 
     <section class="container mb-5">

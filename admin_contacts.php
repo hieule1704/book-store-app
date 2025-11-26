@@ -47,6 +47,12 @@ if (isset($_GET['delete'])) {
 
    <section class="container my-5">
       <h1 class="text-center text-uppercase mb-4">Messages</h1>
+      <!-- EXPORT BUTTON -->
+      <div class="text-end mb-3">
+         <a href="admin_export.php?table=message" class="btn btn-success">
+            <i class="fas fa-file-download me-2"></i> Export Messages
+         </a>
+      </div>
       <div class="row g-4">
          <?php
          $select_message = mysqli_query($conn, "SELECT * FROM `message`") or die('query failed');

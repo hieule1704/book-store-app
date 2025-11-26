@@ -109,6 +109,11 @@ if (isset($_POST['update_publisher'])) {
     </section>
 
     <section class="container mb-5">
+        <div class="text-end mb-3">
+            <a href="admin_export.php?table=publisher" class="btn btn-success">
+                <i class="fas fa-file-download me-2"></i> Export Messages
+            </a>
+        </div>
         <div class="row g-4">
             <?php
             $select_publishers = mysqli_query($conn, "SELECT * FROM `publisher`") or die('query failed');
