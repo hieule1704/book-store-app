@@ -1,149 +1,167 @@
-# Bookly - Online Bookstore
+Bookly - Modern Online Bookstore
+Bookly is a robust, full-featured B2C E-commerce application built with Native PHP 8, MySQL, and Bootstrap 5. It features advanced functionality including Google OAuth login, Email verification (SMTP), QR Code payments (VietQR), and a comprehensive Admin Dashboard with analytics.
 
-<!-- (Insert project illustration here) -->
+✨ Features
+🛒 User Features
+Advanced Authentication:
 
-Bookly is a modern, feature-rich online bookstore web application built with **PHP**, **MySQL**, and **Bootstrap 5**. It offers a seamless experience for users to browse, search, and purchase books, and provides a robust admin panel for managing products, orders, users, and messages.
+Secure Registration & Login.
 
----
+Google Login (OAuth 2.0) integration.
 
-## ✨ Features
+Email Verification via OTP/Link.
 
-### 🛒 User Features
+Forgot Password recovery system.
 
-- **User Authentication:** Secure registration, login, and logout.
-- **Product Catalog:** Browse, search, and filter books by name, author, or publisher.
-- **Product Details:** View detailed information and images for each book.
-- **Shopping Cart:** Add, update, and remove books from your cart.
-- **Buy Now:** Instantly purchase a single book with one click.
-- **Checkout:** Place orders with address and payment method.
-- **Order History:** View all your placed orders.
-- **Contact Form:** Send messages to the admin for support.
+Smart Shopping:
 
-### 🛠️ Admin Features
+Search & Filter: Real-time filtering by Author, Publisher, and Price.
 
-- **Dashboard:** Overview of orders, users, products, and messages.
-- **Product Management:** Add, update, and delete books with images.
-- **Order Management:** View, update payment status, delete, and export orders to Excel.
-- **User Management:** View and delete user accounts.
-- **Message Management:** View and delete contact messages.
+Stock Management: Visual indicators for low stock or out-of-stock items.
 
-### 💎 UI/UX
+Cart System: Dynamic cart updates and management.
 
-- **Responsive Design:** Fully responsive using Bootstrap 5.
-- **Modern Look:** Clean, user-friendly interface with Font Awesome icons.
-- **Interactive Animations:** Product cards grow on hover for a lively shopping experience.
-- **Beautiful Forms:** Animated, modern login and registration forms.
-- **Carousel Ribbons:** Featured authors and publishers with image carousels.
-- **No Custom CSS Required:** All styling is handled by Bootstrap and CDN stylesheets, with minimal custom CSS for effects.
+Checkout: Streamlined checkout flow with address validation.
 
----
+Payment Integration:
 
-## 🚀 Technologies Used
+Cash on Delivery (COD).
 
-- **Backend:**  
-  ![PHP](https://img.shields.io/badge/PHP-7%2B-blue?logo=php)  
-  ![MySQL](https://img.shields.io/badge/MySQL-8%2B-blue?logo=mysql)
-- **Frontend:**  
-  ![Bootstrap 5](https://img.shields.io/badge/Bootstrap-5.3-purple?logo=bootstrap)  
-  ![Font Awesome 6](https://img.shields.io/badge/Font%20Awesome-6-blue?logo=fontawesome)
-- **Database:**  
-  MySQL
-- **Other:**  
-  HTML5, CSS3, JavaScript (optional for interactivity)
+VietQR Support: Auto-generate QR codes for bank transfers.
 
----
+Content & Engagement:
 
-## 📦 Getting Started
+Blog System: Read articles and news.
 
-### Prerequisites
+Author & Publisher Profiles: Dedicated pages to browse books by specific creators.
 
-- PHP 7.x or higher
-- MySQL 8.x or compatible
-- Web server (e.g., Apache, Nginx)
-- Composer (optional, for local development)
+Dark Mode: Toggle between Light/Dark themes.
 
-### Installation
+🛠️ Admin Features
+Dashboard Analytics: Visual charts (Chart.js) for revenue, best-selling products, and user statistics.
 
-1. **Clone the repository:**
+Inventory Management:
 
-   ```bash
-   git clone https://github.com/hieu1704/book-store-app.git
-   cd bookly
-   ```
+CRUD Operations: Manage Books, Authors, Publishers, and Categories.
 
-2. **Import the database:**
+Bulk Import: Import products via CSV file.
 
-   - Import the provided SQL file (`shop_db_with_data.sql`) into your MySQL server.
-   - Update `config.php` with your database credentials.
-   - Confige https://console.cloud.google.com to login with google account.
+Data Export: Export Orders, Users, and Products to CSV.
 
-3. **Configure your web server:**
+CMS: Built-in Blog editor (CKEditor 5).
 
-   - Point your web server’s document root to the project folder.
+Order Processing: Update payment statuses and manage delivery workflows.
 
-4. **Start using Bookly:**
-   - Open your browser and go to `http://localhost/book-store-app` (or your configured domain).
+🚀 Technologies Used
+Backend: PHP 8.0+
 
----
+Database: MySQL / MariaDB
 
-## 📁 Folder Structure
+Frontend: Bootstrap 5.3, FontAwesome 6, JavaScript.
 
-```
-project/
+Libraries (via Composer):
+
+google/apiclient: Google OAuth 2.0.
+
+phpmailer/phpmailer: SMTP Email sending.
+
+vlucas/phpdotenv: Environment variable management.
+
+Chart.js: Data visualization.
+
+CKEditor 5: Rich text editor.
+
+📦 Installation & Setup
+Follow these steps to get the project running on your local machine.
+
+1. Prerequisites
+   PHP: Version 8.0 or higher.
+
+Composer: Dependency manager for PHP.
+
+MySQL: Local server (XAMPP/WAMP/Laragon).
+
+2. Clone the Repository
+   Bash
+
+git clone https://github.com/hieu1704/book-store-app.git
+cd bookly 3. Install Dependencies
+This project uses Composer to manage libraries. Run the following command in the root directory:
+
+Bash
+
+composer install
+This will create a vendor/ folder containing PHPMailer, Google Client, etc.
+
+4. Database Setup
+   Open phpMyAdmin (or your preferred SQL tool).
+
+Create a new database named shop_db.
+
+Import the provided SQL file:
+
+File: shop_db.sql (Located in the root directory).
+
+Check config.php: Ensure the connection settings match your local database user (default is usually root with no password).
+
+PHP
+
+// config.php
+$conn = mysqli_connect('localhost', 'root', '', 'shop_db') or die('connection failed'); 5. Environment Configuration (.env)
+This project uses a .env file to secure sensitive credentials.
+
+Rename the file .env.example (if it exists) to .env, or create a new file named .env in the root directory.
+
+Add the following configuration keys:
+
+Ini, TOML
+
+# Google Login Configuration
+
+# Get these from https://console.cloud.google.com
+
+GOOGLE_CLIENT_ID=your_google_client_id_here
+GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+
+# SMTP Email Configuration (for Forgot Password & Verification)
+
+# Example using Gmail App Password
+
+SMTP_HOST=smtp.gmail.com
+SMTP_USER=your_email@gmail.com
+SMTP_PASS="your_app_password_here"
+SMTP_PORT=587
+SMTP_SECURE=tls
+
+# Sender Information
+
+MAIL_FROM=your_email@gmail.com
+MAIL_FROM_NAME="Bookly Bookstore" 6. Start the Server
+If you are using XAMPP, ensure Apache and MySQL are running. Place the project folder in htdocs. Access the site via: http://localhost/bookly/home.php
+
+📁 Project Structure
+bookly/
+├── .env # Environment variables (GIT IGNORED)
+├── composer.json # Dependencies definition
+├── config.php # Database connection
+├── session*config.php # Secure session settings
+├── vendor/ # Composer libraries (Auto-generated)
 │
-├── admin_contacts.php
-├── admin_header.php
-├── admin_orders.php
-├── admin_page.php
-├── admin_products.php
-├── admin_users.php
-├── cart.php
-├── checkout.php
-├── config.php
-├── contact.php
-├── footer.php
-├── header.php
-├── home.php
-├── login.php
-├── logout.php
-├── orders.php
-├── register.php
-├── search_page.php
-├── shop.php
-├── about.php
-├── uploaded_img/         # Uploaded product images
-├── images/               # Static images (about, authors, etc.)
-└── js/
-    └── script.js         # (Optional) Custom JS for user pages
-```
+├── admin*_.php # Admin controllers (products, orders, stats...)
+├── _.php # User controllers (home, shop, cart...)
+│
+├── uploaded_img/ # Product & Blog images
+└── shop_db.sql # Database import file
+🔑 Admin Credentials
+(Default credentials if imported from shop_db.sql)
 
----
+Email: lehieu17042004@gmail.com (or check the users table for user_type = 'admin')
 
-## 🛠️ Customization
+Password: (Check the database or register a new admin via code logic)
 
-- **Images:** Place your product and author images in the `uploaded_img/` and `images/` folders.
-- **Branding:** Update the site name, logo, and footer in `header.php` and `footer.php`.
-- **Contact Info:** Edit contact details in `footer.php`.
-- **Animations:** Product card hover and form fade-in are handled by minimal custom CSS.
+📝 Notes for Developers
+Google Login: To test this locally, ensure your Google Cloud Console "Authorized redirect URIs" includes http://localhost/bookly/google_login.php.
 
----
+Email Sending: If using Gmail, you must enable "2-Step Verification" and generate an App Password to put in the .env file. Do not use your raw login password.
 
-## 📝 Notes
-
-- All styling is handled by Bootstrap 5 and Font Awesome via CDN.
-- Minimal custom CSS is used for product card hover and form animation.
-- Admin and user authentication is session-based.
-- "Buy now" and "Add to cart" are both supported for flexible shopping.
-- Admin can export orders to Excel (CSV) with one click.
-
----
-
-**Made with ❤️ by Double H**
-
-![Login page](image.png)
-
-![Admin page](image-1.png)
-
-![User home page](image-2.png)
-
-![Shop demo](image-3.png)
+Made with ❤️ by Double H
