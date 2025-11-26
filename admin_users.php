@@ -13,9 +13,50 @@ if (!$admin_id) {
 
 if (isset($_GET['delete'])) {
    $delete_id = intval($_GET['delete']);
-   mysqli_query($conn, "DELETE FROM `users` WHERE id = $delete_id") or die('query failed');
-   header('Location: admin_users.php');
-   exit;
+
+   // Start transaction to keep DB consistent
+   mysqli_begin_transaction($conn);
+
+   try {
+      // 1. Delete related cart items
+      $res = mysqli_query($conn, "DELETE FROM `cart` WHERE user_id = $delete_id");
+      if ($res === false) throw new Exception(mysqli_error($conn));
+
+      // 2. Delete related messages
+      $res = mysqli_query($conn, "DELETE FROM `message` WHERE user_id = $delete_id");
+      if ($res === false) throw new Exception(mysqli_error($conn));
+
+      // 3. Delete order_items for orders that belong to the user (if any)
+      $order_ids = [];
+      $orders_res = mysqli_query($conn, "SELECT id FROM `orders` WHERE user_id = $delete_id") or throw new Exception(mysqli_error($conn));
+      while ($row = mysqli_fetch_assoc($orders_res)) {
+         $order_ids[] = intval($row['id']);
+      }
+
+      if (!empty($order_ids)) {
+         $ids = implode(',', $order_ids);
+
+         // delete related order_items
+         $res = mysqli_query($conn, "DELETE FROM `order_items` WHERE order_id IN ($ids)");
+         if ($res === false) throw new Exception(mysqli_error($conn));
+
+         // delete orders
+         $res = mysqli_query($conn, "DELETE FROM `orders` WHERE id IN ($ids)");
+         if ($res === false) throw new Exception(mysqli_error($conn));
+      }
+
+      // 4. Now safe to delete the user
+      $res = mysqli_query($conn, "DELETE FROM `users` WHERE id = $delete_id");
+      if ($res === false) throw new Exception(mysqli_error($conn));
+
+      mysqli_commit($conn);
+      header('Location: admin_users.php');
+      exit;
+   } catch (Exception $e) {
+      mysqli_rollback($conn);
+      // short error output for admin debugging
+      die('Delete failed: ' . $e->getMessage());
+   }
 }
 
 ?>

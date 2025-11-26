@@ -35,6 +35,15 @@ if (isset($_POST['add_to_cart'])) {
 
 if (isset($_POST['more_detail'])) {
    $product_id = $_POST['product_id'];
+   // FEATURE 2: RECENTLY VIEWED (Save to Cookie)
+   $viewed = $_COOKIE['viewed_products'] ?? '';
+   $viewed_arr = array_filter(explode(',', $viewed));
+   if (!in_array($product_id, $viewed_arr)) {
+      array_unshift($viewed_arr, $product_id); // Add to beginning
+      $viewed_arr = array_slice($viewed_arr, 0, 4); // Keep only last 4
+      setcookie('viewed_products', implode(',', $viewed_arr), time() + (86400 * 30), "/");
+   }
+
    header("Location: detail.php?id=$product_id");
    exit();
 }
@@ -62,22 +71,89 @@ if (isset($_POST['more_detail'])) {
    <link rel="stylesheet" href="style.css">
 
    <style>
-      /* Add this CSS for product card hover effect */
+      /* KEEP page-specific styles only (removed the shared :root and theme-toggle rules).
+         Dark-mode variables and toggle are now in header.php so they're consistent site-wide. */
+
+      /* Product Card Hover */
       .product-card {
          transition: transform 0.25s cubic-bezier(.4, 2, .6, 1), box-shadow 0.25s;
          will-change: transform;
          z-index: 1;
+         position: relative;
+         overflow: hidden;
+         box-shadow: 0 4px 6px var(--card-shadow);
       }
 
       .product-card:hover {
          transform: scale(1.06) translateY(-8px);
-         box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+         box-shadow: 0 10px 20px var(--card-shadow);
          z-index: 2;
       }
+
+      /* Product Tags */
+      .product-tag {
+         position: absolute;
+         top: 15px;
+         left: 15px;
+         padding: 5px 12px;
+         border-radius: 20px;
+         font-size: 0.75rem;
+         font-weight: 700;
+         text-transform: uppercase;
+         color: white;
+         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+         z-index: 10;
+      }
+
+      .tag-bestseller {
+         background: linear-gradient(45deg, #ffc107, #ffca2c);
+         color: #000;
+      }
+
+      .tag-new {
+         background: linear-gradient(45deg, #198754, #20c997);
+      }
+
+      .tag-sale {
+         background: linear-gradient(45deg, #dc3545, #f75667);
+      }
+
+      .tag-default {
+         background: #6c757d;
+      }
+
+      /* Flash Sale Animation */
+      @keyframes pulse-red {
+         0% {
+            transform: scale(1);
+         }
+
+         50% {
+            transform: scale(1.05);
+         }
+
+         100% {
+            transform: scale(1);
+         }
+      }
+
+      .flash-sale-banner {
+         background: linear-gradient(90deg, #dc3545 0%, #fd7e14 100%);
+         color: white;
+      }
+
+      .countdown-box {
+         background: rgba(0, 0, 0, 0.2);
+         padding: 5px 15px;
+         border-radius: 10px;
+         font-family: 'Courier New', monospace;
+         font-weight: bold;
+         display: inline-block;
+      }
+
+      /* Theme toggle button styling removed from here; now centralized in header.php */
    </style>
-
 </head>
-
 
 <body>
 
@@ -99,8 +175,38 @@ if (isset($_POST['more_detail'])) {
       </div>
    </section>
 
-   <!-- Featured Book Ribbon Carousel (Images Only) -->
-   <section class="py-4" style="width:100vw; max-width:100vw; margin-left:calc(-50vw + 50%); background: #f8f9fa;">
+   <!-- FLASH SALE BANNER -->
+   <div class="flash-sale-banner py-3 text-center">
+      <div class="container d-flex justify-content-center align-items-center gap-3 flex-wrap">
+         <span class="fs-4 fw-bold"><i class="fas fa-bolt text-warning me-2"></i> FLASH SALE</span>
+         <span class="fs-5">Ends in:</span>
+         <span id="countdown" class="countdown-box fs-4">02:15:30</span>
+         <span class="badge bg-warning text-dark ms-2">UP TO 50% OFF</span>
+      </div>
+   </div>
+
+   <script>
+      // Simple Countdown Script
+      let time = (2 * 3600) + (15 * 60) + 30;
+
+      setInterval(() => {
+         let h = Math.floor(time / 3600);
+         let m = Math.floor((time % 3600) / 60);
+         let s = time % 60;
+
+         h = h < 10 ? '0' + h : h;
+         m = m < 10 ? '0' + m : m;
+         s = s < 10 ? '0' + s : s;
+
+         document.getElementById('countdown').innerText = `${h}:${m}:${s}`;
+
+         if (time > 0) time--;
+         else time = 7200;
+      }, 1000);
+   </script>
+
+   <!-- Ribbon Carousel -->
+   <section class="py-4" style="width:100vw; max-width:100vw; margin-left:calc(-50vw + 50%); background: var(--light-bg);">
       <div class="container-fluid px-0">
          <div id="bookRibbonCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
             <div class="carousel-inner">
@@ -122,36 +228,6 @@ if (isset($_POST['more_detail'])) {
                         style="height:440px; width:90vw; max-width:1600px; object-fit:cover; background:#fff;" alt="Featured Book 3">
                   </div>
                </div>
-               <div class="carousel-item">
-                  <div class="d-flex justify-content-center align-items-center" style="height: 480px;">
-                     <img src="other_resource/ribbon4.jpg" class="rounded-4 shadow-lg border border-4 border-danger"
-                        style="height:440px; width:90vw; max-width:1600px; object-fit:cover; background:#fff;" alt="Featured Book 4">
-                  </div>
-               </div>
-               <div class="carousel-item">
-                  <div class="d-flex justify-content-center align-items-center" style="height: 480px;">
-                     <img src="other_resource/ribbon5.jpg" class="rounded-4 shadow-lg border border-4 border-info"
-                        style="height:440px; width:90vw; max-width:1600px; object-fit:cover; background:#fff;" alt="Featured Book 5">
-                  </div>
-               </div>
-               <div class="carousel-item">
-                  <div class="d-flex justify-content-center align-items-center" style="height: 480px;">
-                     <img src="other_resource/ribbon6.jpg" class="rounded-4 shadow-lg border border-4 border-primary"
-                        style="height:440px; width:90vw; max-width:1600px; object-fit:cover; background:#fff;" alt="Featured Book 6">
-                  </div>
-               </div>
-               <div class="carousel-item">
-                  <div class="d-flex justify-content-center align-items-center" style="height: 480px;">
-                     <img src="other_resource/ribbon7.jpg" class="rounded-4 shadow-lg border border-4 border-warning"
-                        style="height:440px; width:90vw; max-width:1600px; object-fit:cover; background:#fff;" alt="Featured Book 7">
-                  </div>
-               </div>
-               <div class="carousel-item">
-                  <div class="d-flex justify-content-center align-items-center" style="height: 480px;">
-                     <img src="other_resource/ribbon8.jpg" class="rounded-4 shadow-lg border border-4 border-success"
-                        style="height:440px; width:90vw; max-width:1600px; object-fit:cover; background:#fff;" alt="Featured Book 8">
-                  </div>
-               </div>
             </div>
             <button class="carousel-control-prev" type="button" data-bs-target="#bookRibbonCarousel" data-bs-slide="prev">
                <span class="carousel-control-prev-icon bg-primary rounded-circle" aria-hidden="true"></span>
@@ -170,16 +246,49 @@ if (isset($_POST['more_detail'])) {
       <h1 class="text-center text-uppercase mb-4">Latest products</h1>
       <div class="d-flex g-4 row">
          <?php
-         // Updated query to use new products table structure
          $select_products = mysqli_query($conn, "SELECT p.*, a.author_name, pub.publisher_name FROM `products` p
             LEFT JOIN `author` a ON p.author_id = a.id
             LEFT JOIN `publisher` pub ON p.publisher_id = pub.id
             ORDER BY p.id DESC LIMIT 8") or die('query failed');
          if (mysqli_num_rows($select_products) > 0) {
             while ($fetch_products = mysqli_fetch_assoc($select_products)) {
+
+               $tag = strtolower(trim($fetch_products['tag'] ?? ''));
+               $tagClass = '';
+               if (!empty($tag)) {
+                  if (strpos($tag, 'bestseller') !== false) $tagClass = 'tag-bestseller';
+                  elseif (strpos($tag, 'new') !== false) $tagClass = 'tag-new';
+                  elseif (strpos($tag, 'sale') !== false) $tagClass = 'tag-sale';
+                  else $tagClass = 'tag-default';
+               }
+
+               // FEATURE 1: STOCK DISPLAY LOGIC
+               $stock = $fetch_products['stock_quantity'];
+               $stockText = "";
+               $stockClass = "";
+               $disableBtn = "";
+
+               if ($stock == 0) {
+                  $stockText = "Out of Stock";
+                  $stockClass = "text-danger";
+                  $disableBtn = "disabled";
+               } elseif ($stock < 5) {
+                  $stockText = "Only $stock left!";
+                  $stockClass = "text-warning fw-bold";
+               } else {
+                  $stockText = "In Stock ($stock)";
+                  $stockClass = "text-success";
+               }
          ?>
                <div class="col-md-3 col-sm-6 mb-4 align-items-stretch">
                   <form action="" method="post" class="card shadow product-card">
+
+                     <?php if (!empty($tag)): ?>
+                        <div class="product-tag <?php echo $tagClass; ?>">
+                           <?php echo htmlspecialchars($fetch_products['tag']); ?>
+                        </div>
+                     <?php endif; ?>
+
                      <a href="detail.php?id=<?php echo htmlspecialchars($fetch_products['id']); ?>" class="bg-white d-flex justify-content-center align-items-center p-2" style="height: 250px;">
                         <img src="uploaded_img/<?php echo $fetch_products['image']; ?>" alt="<?php echo htmlspecialchars($fetch_products['book_name']); ?>" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;">
                      </a>
@@ -187,8 +296,13 @@ if (isset($_POST['more_detail'])) {
                         <div title="<?php echo htmlspecialchars($fetch_products['book_name']); ?>" class="mb-2 fw-bold fs-5 line-clamp-2"><?php echo htmlspecialchars($fetch_products['book_name']); ?></div>
                         <div class="mb-2 text-secondary small">
                            <span><i class="fa-solid fa-user"></i> <?php echo htmlspecialchars($fetch_products['author_name']); ?></span>
-                           <span class="ms-2"><i class="fa-solid fa-building"></i> <?php echo htmlspecialchars($fetch_products['publisher_name']); ?></span>
                         </div>
+
+                        <!-- STOCK DISPLAY -->
+                        <div class="mb-2 small <?php echo $stockClass; ?>">
+                           <i class="fas fa-box"></i> <?php echo $stockText; ?>
+                        </div>
+
                         <div class="mb-2 text-danger fs-5 fw-bold">$<?php echo number_format($fetch_products['price'], 0, ',', '.'); ?></div>
                         <input type="hidden" name="product_id" value="<?php echo $fetch_products['id']; ?>">
                         <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($fetch_products['book_name']); ?>">
@@ -196,8 +310,8 @@ if (isset($_POST['more_detail'])) {
                         <input type="hidden" name="product_image" value="<?php echo $fetch_products['image']; ?>">
                         <input type="hidden" name="product_quantity" value="1">
                         <div class="mt-auto d-flex gap-2">
-                           <button type="submit" name="add_to_cart" class="btn btn-primary w-50">Add to cart</button>
-                           <button type="submit" name="buy_now" formaction="checkout.php" formmethod="post" class="btn btn-success w-50">Buy now</button>
+                           <button type="submit" name="add_to_cart" class="btn btn-primary w-50" <?php echo $disableBtn; ?>>Add</button>
+                           <button type="submit" name="more_detail" class="btn btn-info w-50 text-white">View</button>
                         </div>
                      </div>
                   </form>
@@ -214,79 +328,44 @@ if (isset($_POST['more_detail'])) {
       </div>
    </section>
 
-   <!-- Best seller Section -->
-   <section class="container py-5">
-      <h1 class="text-center text-uppercase mb-4">Best seller</h1>
-      <div class="row g-4">
-         <?php
-         // Updated query to use new products table structure
-         $select_products = mysqli_query($conn, "SELECT p.*, a.author_name, pub.publisher_name FROM `products` p
-            LEFT JOIN `author` a ON p.author_id = a.id
-            LEFT JOIN `publisher` pub ON p.publisher_id = pub.id
-            WHERE tag = 'bestseller' LIMIT 8") or die('query failed');
-         if (mysqli_num_rows($select_products) > 0) {
-            while ($fetch_products = mysqli_fetch_assoc($select_products)) {
-         ?>
-               <div class="col-md-3 col-sm-6 mb-4 align-items-stretch">
-                  <form action="" method="post" class="card shadow  product-card">
-                     <a href="detail.php?id=<?php echo htmlspecialchars($fetch_products['id']); ?>" class="bg-white d-flex justify-content-center align-items-center p-2" style="height: 250px;">
-                        <img src="uploaded_img/<?php echo $fetch_products['image']; ?>" alt="<?php echo htmlspecialchars($fetch_products['book_name']); ?>" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+   <!-- FEATURE 2: RECENTLY VIEWED HISTORY -->
+   <?php
+   $viewed_ids = $_COOKIE['viewed_products'] ?? '';
+   if (!empty($viewed_ids)):
+      $viewed_products_query = mysqli_query($conn, "SELECT * FROM `products` WHERE id IN ($viewed_ids)");
+      if (mysqli_num_rows($viewed_products_query) > 0):
+   ?>
+         <section class="container py-5 bg-light rounded">
+            <h3 class="mb-4 fw-bold"><i class="fas fa-history text-secondary"></i> Recently Viewed</h3>
+            <div class="row g-3">
+               <?php while ($v_product = mysqli_fetch_assoc($viewed_products_query)): ?>
+                  <div class="col-6 col-md-3 col-lg-2">
+                     <a href="detail.php?id=<?php echo $v_product['id']; ?>" class="card shadow-sm text-decoration-none text-dark h-100">
+                        <img src="uploaded_img/<?php echo $v_product['image']; ?>" class="card-img-top p-2" style="height:120px; object-fit:contain;" alt="Book">
+                        <div class="card-body p-2 text-center">
+                           <small class="d-block text-truncate fw-bold"><?php echo htmlspecialchars($v_product['book_name']); ?></small>
+                           <span class="text-danger fw-bold small">$<?php echo $v_product['price']; ?></span>
+                        </div>
                      </a>
-                     <div class="card-body d-flex flex-column text-center">
-                        <div title="<?php echo htmlspecialchars($fetch_products['book_name']); ?>" class="mb-2 fw-bold fs-5 line-clamp-2"><?php echo htmlspecialchars($fetch_products['book_name']); ?></div>
-                        <div class="mb-2 text-secondary small">
-                           <span><i class="fa-solid fa-user"></i> <?php echo htmlspecialchars($fetch_products['author_name']); ?></span>
-                           <span class="ms-2"><i class="fa-solid fa-building"></i> <?php echo htmlspecialchars($fetch_products['publisher_name']); ?></span>
-                        </div>
-                        <div class="mb-2 text-danger fs-5 fw-bold">$<?php echo number_format($fetch_products['price'], 0, ',', '.'); ?></div>
-                        <input type="hidden" name="product_id" value="<?php echo $fetch_products['id']; ?>">
-                        <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($fetch_products['book_name']); ?>">
-                        <input type="hidden" name="product_price" value="<?php echo $fetch_products['price']; ?>">
-                        <input type="hidden" name="product_image" value="<?php echo $fetch_products['image']; ?>">
-                        <input type="hidden" name="product_quantity" value="1">
-                        <div class="mt-auto d-flex gap-2">
-                           <button type="submit" name="add_to_cart" class="btn btn-primary w-50">Add to cart</button>
-                           <button type="submit" name="buy_now" formaction="checkout.php" formmethod="post" class="btn btn-success w-50">Buy now</button>
-                        </div>
-                     </div>
-                  </form>
-               </div>
+                  </div>
+               <?php endwhile; ?>
+            </div>
+         </section>
+   <?php endif;
+   endif; ?>
 
-         <?php
-            }
-         } else {
-            echo '<div class="col-12"><div class="alert alert-info text-center">No products added yet!</div></div>';
-         }
-         ?>
-      </div>
-      <div class="text-center mt-4">
-         <a href="shop.php" class="btn btn-warning">Load more</a>
-      </div>
-   </section>
-
-   <!-- About Section -->
-   <section class="container py-5">
-      <div class="row align-items-center">
-         <div class="col-lg-6 mb-4 mb-lg-0">
-            <img src="images/about-img.jpg" alt="" class="img-fluid rounded shadow">
-         </div>
-         <div class="col-lg-6">
-            <h3 class="fw-bold mb-3">About us</h3>
-            <p>We are a passionate online bookstore dedicated to bringing knowledge and inspiration to readers. Every book is carefully selected to spark curiosity and enrich your reading experience.</p>
-            <p>Join us on this literary journey and discover the joy of reading. Whether you're a lifelong book lover or just starting your reading adventure, we have something special for you.</p>
-            <a href="about.php" class="btn btn-primary">Read more</a>
-         </div>
-      </div>
-   </section>
-
-   <!-- Contact Section -->
-   <section class="bg-light py-5">
+   <!-- FEATURE 3: NEWSLETTER SUBSCRIPTION -->
+   <section class="py-5 mt-5" style="background: linear-gradient(45deg, #4f46e5, #06b6d4);">
       <div class="container">
-         <div class="row justify-content-center">
-            <div class="col-lg-8 text-center">
-               <h3 class="fw-bold mb-3">Have any questions?</h3>
-               <p class="mb-4">We're here to help! If you have any questions about our books, your order, or anything else, feel free to reach out to us anytime.</p>
-               <a href="contact.php" class="btn btn-outline-primary btn-lg">Contact us</a>
+         <div class="row justify-content-center text-center text-white">
+            <div class="col-lg-6">
+               <h2 class="fw-bold mb-3"><i class="fas fa-envelope-open-text"></i> Join Our Newsletter</h2>
+               <p class="mb-4">Subscribe to get the latest updates, flash sales, and exclusive offers delivered to your inbox.</p>
+               <form id="newsletterForm" class="d-flex gap-2">
+                  <input type="email" name="email" id="subEmail" class="form-control form-control-lg" placeholder="Enter your email address" required>
+                  <button type="submit" class="btn btn-warning btn-lg fw-bold">Subscribe</button>
+               </form>
+               <div id="subMessage" class="mt-3 fw-bold"></div>
             </div>
          </div>
       </div>
@@ -296,6 +375,71 @@ if (isset($_POST['more_detail'])) {
 
    <!-- Bootstrap 5.3.x JS Bundle -->
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+   <script>
+      // FEATURE 3: AJAX NEWSLETTER
+      document.getElementById('newsletterForm').addEventListener('submit', function(e) {
+         e.preventDefault();
+         const email = document.getElementById('subEmail').value;
+         const msgDiv = document.getElementById('subMessage');
+
+         const formData = new FormData();
+         formData.append('email', email);
+
+         fetch('subscribe.php', {
+               method: 'POST',
+               body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+               if (data.trim() === 'success') {
+                  msgDiv.innerHTML = '<span class="text-white bg-success px-3 py-1 rounded">Thank you for subscribing!</span>';
+                  document.getElementById('subEmail').value = '';
+               } else {
+                  msgDiv.innerHTML = '<span class="text-warning">' + data + '</span>';
+               }
+            });
+      });
+
+      // Simple Countdown Script (keep)
+      let time = (2 * 3600) + (15 * 60) + 30;
+      setInterval(() => {
+         let h = Math.floor(time / 3600);
+         let m = Math.floor((time % 3600) / 60);
+         let s = time % 60;
+         h = h < 10 ? '0' + h : h;
+         m = m < 10 ? '0' + m : m;
+         s = s < 10 ? '0' + s : s;
+         document.getElementById('countdown').innerText = `${h}:${m}:${s}`;
+         if (time > 0) time--;
+         else time = 7200;
+      }, 1000);
+
+      // FEATURE 4: DARK MODE LOGIC
+      function toggleTheme() {
+         const body = document.body;
+         const icon = document.getElementById('theme-icon');
+
+         if (body.getAttribute('data-theme') === 'dark') {
+            body.removeAttribute('data-theme');
+            icon.classList.remove('fa-sun');
+            icon.classList.add('fa-moon');
+            localStorage.setItem('theme', 'light');
+         } else {
+            body.setAttribute('data-theme', 'dark');
+            icon.classList.remove('fa-moon');
+            icon.classList.add('fa-sun');
+            localStorage.setItem('theme', 'dark');
+         }
+      }
+
+      // Check saved theme on load
+      if (localStorage.getItem('theme') === 'dark') {
+         document.body.setAttribute('data-theme', 'dark');
+         document.getElementById('theme-icon').classList.remove('fa-moon');
+         document.getElementById('theme-icon').classList.add('fa-sun');
+      }
+   </script>
 
 </body>
 
