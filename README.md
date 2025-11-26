@@ -1,167 +1,135 @@
-Bookly - Modern Online Bookstore
-Bookly is a robust, full-featured B2C E-commerce application built with Native PHP 8, MySQL, and Bootstrap 5. It features advanced functionality including Google OAuth login, Email verification (SMTP), QR Code payments (VietQR), and a comprehensive Admin Dashboard with analytics.
+# Bookly — Modern Online Bookstore
 
-✨ Features
-🛒 User Features
-Advanced Authentication:
+Bookly is a lightweight, native PHP online bookstore built with PHP 8, MySQL/MariaDB and Bootstrap 5. It includes user authentication, email verification, password reset, cart & checkout, admin tools and a responsive UI.
 
-Secure Registration & Login.
+---
 
-Google Login (OAuth 2.0) integration.
+## Quick demo / highlights
 
-Email Verification via OTP/Link.
+- Email verification and password reset (SMTP / PHPMailer)
+- Google OAuth (optional)
+- Cart, checkout, order history
+- Admin dashboard with basic product management
+- Dark mode toggle and responsive Bootstrap UI
 
-Forgot Password recovery system.
+---
 
-Smart Shopping:
+## Tech stack
 
-Search & Filter: Real-time filtering by Author, Publisher, and Price.
+- PHP 8.x
+- MySQL / MariaDB
+- Bootstrap 5.3, Font Awesome
+- Composer libraries:
+  - phpmailer/phpmailer
+  - vlucas/phpdotenv
+  - google/apiclient (optional)
 
-Stock Management: Visual indicators for low stock or out-of-stock items.
+---
 
-Cart System: Dynamic cart updates and management.
+## Requirements
 
-Checkout: Streamlined checkout flow with address validation.
+- PHP 8.0+
+- Composer
+- MySQL / MariaDB (XAMPP, WAMP, Laragon, etc.)
+- Web server (Apache / Nginx)
 
-Payment Integration:
+---
 
-Cash on Delivery (COD).
+## Installation
 
-VietQR Support: Auto-generate QR codes for bank transfers.
+1. Clone repository
 
-Content & Engagement:
+   ```
+   git clone https://github.com/hieu1704/book-store-app.git
+   cd book-store-app
+   ```
 
-Blog System: Read articles and news.
+2. Install PHP dependencies
 
-Author & Publisher Profiles: Dedicated pages to browse books by specific creators.
+   ```
+   composer install
+   ```
 
-Dark Mode: Toggle between Light/Dark themes.
+3. Database
 
-🛠️ Admin Features
-Dashboard Analytics: Visual charts (Chart.js) for revenue, best-selling products, and user statistics.
+   - Create database `shop_db`.
+   - Import `shop_db.sql` using phpMyAdmin or mysql CLI:
+     ```
+     mysql -u root -p shop_db < shop_db.sql
+     ```
 
-Inventory Management:
+4. Configuration
 
-CRUD Operations: Manage Books, Authors, Publishers, and Categories.
+   - Copy `.env.example` to `.env` (or create `.env`) and set SMTP / Google values:
 
-Bulk Import: Import products via CSV file.
+     ```
+     SMTP_HOST=smtp.example.com
+     SMTP_USER=you@example.com
+     SMTP_PASS=your_smtp_password
+     SMTP_PORT=587
+     SMTP_SECURE=tls
 
-Data Export: Export Orders, Users, and Products to CSV.
+     MAIL_FROM=you@example.com
+     MAIL_FROM_NAME="Bookly Store"
 
-CMS: Built-in Blog editor (CKEditor 5).
+     GOOGLE_CLIENT_ID=...
+     GOOGLE_CLIENT_SECRET=...
+     ```
 
-Order Processing: Update payment statuses and manage delivery workflows.
+   - Update `config.php` DB credentials if needed:
+     ```php
+     // config.php
+     $conn = mysqli_connect('localhost', 'root', '', 'shop_db') or die('connection failed');
+     ```
 
-🚀 Technologies Used
-Backend: PHP 8.0+
+5. Place project in your web root (e.g. XAMPP `htdocs`) and open:
+   ```
+   http://localhost/bookly/
+   ```
 
-Database: MySQL / MariaDB
+---
 
-Frontend: Bootstrap 5.3, FontAwesome 6, JavaScript.
+## Files & structure (important)
 
-Libraries (via Composer):
+- config.php — DB connection
+- session_config.php — secure session start
+- header.php — shared header / dark-mode CSS
+- forgot_password.php, reset_password.php — email reset flow
+- vendor/ — Composer packages
+- uploaded_img/ — product images
+- shop_db.sql — DB dump
 
-google/apiclient: Google OAuth 2.0.
+---
 
-phpmailer/phpmailer: SMTP Email sending.
+## Notes & troubleshooting
 
-vlucas/phpdotenv: Environment variable management.
+- If email sending fails, check `.env` SMTP settings and allow less-secure / app-password as needed for Gmail.
+- If reset links show "invalid" or "expired":
+  - Verify `reset_token` and `reset_expiry` are written in `users` table.
+  - Ensure `reset_expiry` is stored as `Y-m-d H:i:s`.
+- For local Google OAuth, set redirect URI in Google Console to:
+  ```
+  http://localhost/bookly/google_login.php
+  ```
+- Use `Ctrl+F5` to force-refresh CSS/JS when testing UI changes.
 
-Chart.js: Data visualization.
+---
 
-CKEditor 5: Rich text editor.
+## Admin
 
-📦 Installation & Setup
-Follow these steps to get the project running on your local machine.
+- Default admin account may be present in `users` table (check `user_type = 'admin'`).
+- Update admin credentials in DB or create an admin via registration then change `user_type`.
 
-1. Prerequisites
-   PHP: Version 8.0 or higher.
+---
 
-Composer: Dependency manager for PHP.
+## Security tips
 
-MySQL: Local server (XAMPP/WAMP/Laragon).
+- Move to `password_hash()` instead of `md5()` for production passwords.
+- Use HTTPS in production.
+- Limit reset token lifetime and throttle forgot-password requests.
 
-2. Clone the Repository
-   Bash
+---
 
-git clone https://github.com/hieu1704/book-store-app.git
-cd bookly 3. Install Dependencies
-This project uses Composer to manage libraries. Run the following command in the root directory:
+## License & credits
 
-Bash
-
-composer install
-This will create a vendor/ folder containing PHPMailer, Google Client, etc.
-
-4. Database Setup
-   Open phpMyAdmin (or your preferred SQL tool).
-
-Create a new database named shop_db.
-
-Import the provided SQL file:
-
-File: shop_db.sql (Located in the root directory).
-
-Check config.php: Ensure the connection settings match your local database user (default is usually root with no password).
-
-PHP
-
-// config.php
-$conn = mysqli_connect('localhost', 'root', '', 'shop_db') or die('connection failed'); 5. Environment Configuration (.env)
-This project uses a .env file to secure sensitive credentials.
-
-Rename the file .env.example (if it exists) to .env, or create a new file named .env in the root directory.
-
-Add the following configuration keys:
-
-Ini, TOML
-
-# Google Login Configuration
-
-# Get these from https://console.cloud.google.com
-
-GOOGLE_CLIENT_ID=your_google_client_id_here
-GOOGLE_CLIENT_SECRET=your_google_client_secret_here
-
-# SMTP Email Configuration (for Forgot Password & Verification)
-
-# Example using Gmail App Password
-
-SMTP_HOST=smtp.gmail.com
-SMTP_USER=your_email@gmail.com
-SMTP_PASS="your_app_password_here"
-SMTP_PORT=587
-SMTP_SECURE=tls
-
-# Sender Information
-
-MAIL_FROM=your_email@gmail.com
-MAIL_FROM_NAME="Bookly Bookstore" 6. Start the Server
-If you are using XAMPP, ensure Apache and MySQL are running. Place the project folder in htdocs. Access the site via: http://localhost/bookly/home.php
-
-📁 Project Structure
-bookly/
-├── .env # Environment variables (GIT IGNORED)
-├── composer.json # Dependencies definition
-├── config.php # Database connection
-├── session*config.php # Secure session settings
-├── vendor/ # Composer libraries (Auto-generated)
-│
-├── admin*_.php # Admin controllers (products, orders, stats...)
-├── _.php # User controllers (home, shop, cart...)
-│
-├── uploaded_img/ # Product & Blog images
-└── shop_db.sql # Database import file
-🔑 Admin Credentials
-(Default credentials if imported from shop_db.sql)
-
-Email: lehieu17042004@gmail.com (or check the users table for user_type = 'admin')
-
-Password: (Check the database or register a new admin via code logic)
-
-📝 Notes for Developers
-Google Login: To test this locally, ensure your Google Cloud Console "Authorized redirect URIs" includes http://localhost/bookly/google_login.php.
-
-Email Sending: If using Gmail, you must enable "2-Step Verification" and generate an App Password to put in the .env file. Do not use your raw login password.
-
-Made with ❤️ by Double H
+Made with ❤️. See project repo for license and contributor details.
