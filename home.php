@@ -295,7 +295,12 @@ if (isset($_POST['more_detail'])) {
                      <div class="card-body d-flex flex-column text-center">
                         <div title="<?php echo htmlspecialchars($fetch_products['book_name']); ?>" class="mb-2 fw-bold fs-5 line-clamp-2"><?php echo htmlspecialchars($fetch_products['book_name']); ?></div>
                         <div class="mb-2 text-secondary small">
-                           <span><i class="fa-solid fa-user"></i> <?php echo htmlspecialchars($fetch_products['author_name']); ?></span>
+                           <span>
+                              <i class="fa-solid fa-user"></i>
+                              <a href="view_author.php?id=<?php echo $fetch_products['author_id']; ?>" class="text-decoration-none text-secondary">
+                                 <?php echo htmlspecialchars($fetch_products['author_name']); ?>
+                              </a>
+                           </span>
                         </div>
 
                         <!-- STOCK DISPLAY -->

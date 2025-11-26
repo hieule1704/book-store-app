@@ -12,6 +12,35 @@ if (!$user_id) {
    exit;
 }
 
+// --- NEW: Handle "Buy Again" POST ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buy_again']) && !empty($_POST['order_id'])) {
+   $order_id = intval($_POST['order_id']);
+
+   // Fetch order items for that order
+   $items_q = mysqli_query($conn, "SELECT oi.product_id, oi.quantity, p.book_name, p.price, p.image FROM `order_items` oi JOIN `products` p ON oi.product_id = p.id WHERE oi.order_id = '$order_id'");
+   if ($items_q && mysqli_num_rows($items_q) > 0) {
+      while ($it = mysqli_fetch_assoc($items_q)) {
+         $pid = intval($it['product_id']);
+         $qty = intval($it['quantity']);
+         $name = mysqli_real_escape_string($conn, $it['book_name']);
+         $price = intval($it['price']);
+         $image = mysqli_real_escape_string($conn, $it['image']);
+
+         // If product already in user's cart, increase quantity, else insert
+         $exists = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id' AND name = '$name' LIMIT 1");
+         if ($exists && mysqli_num_rows($exists) > 0) {
+            $row = mysqli_fetch_assoc($exists);
+            $newQty = intval($row['quantity']) + $qty;
+            mysqli_query($conn, "UPDATE `cart` SET quantity = '$newQty', price = '$price', image = '$image' WHERE id = " . intval($row['id']));
+         } else {
+            mysqli_query($conn, "INSERT INTO `cart` (user_id, name, price, quantity, image) VALUES ('$user_id', '$name', '$price', '$qty', '$image')");
+         }
+      }
+   }
+   // Redirect to checkout to continue with order
+   header('Location: checkout.php');
+   exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -123,7 +152,10 @@ if (!$user_id) {
                      <?php if ($fetch_orders['payment_status'] == 'completed'): ?>
                         <div class="card-footer bg-light p-3 text-end">
                            <a href="contact.php" class="btn btn-sm btn-outline-secondary">Need Help?</a>
-                           <button class="btn btn-sm btn-primary ms-2">Buy Again</button>
+                           <form method="post" class="d-inline ms-2">
+                              <input type="hidden" name="order_id" value="<?php echo $order_id; ?>">
+                              <button type="submit" name="buy_again" class="btn btn-sm btn-primary">Buy Again</button>
+                           </form>
                         </div>
                      <?php endif; ?>
                   </div>

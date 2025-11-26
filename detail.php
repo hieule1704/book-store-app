@@ -88,8 +88,16 @@ if (isset($_POST['add_to_cart'])) {
                     <div class="card-body">
                         <h2 class="card-title fs-1 fw-bold mb-4"><?php echo htmlspecialchars($product['book_name']); ?></h2>
                         <div class="fs-6">
-                            <p>Publisher: <?php echo htmlspecialchars($product['publisher_name']) ?></p>
-                            <p>Author: <?php echo htmlspecialchars($product['author_name']) ?></p>
+                            <p>Publisher:
+                                <a href="view_publisher.php?id=<?php echo $product['publisher_id']; ?>" class="text-decoration-none fw-bold">
+                                    <?php echo htmlspecialchars($product['publisher_name']) ?>
+                                </a>
+                            </p>
+                            <p>Author:
+                                <a href="view_author.php?id=<?php echo $product['author_id']; ?>" class="text-decoration-none fw-bold">
+                                    <?php echo htmlspecialchars($product['author_name']) ?>
+                                </a>
+                            </p>
                             <p>Publish Year: <?php echo htmlspecialchars($product['publish_year']) ?></p>
                             <p>Book Layout: <?php echo htmlspecialchars($product['total_page']) ?> pages</p>
                         </div>

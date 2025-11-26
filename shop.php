@@ -246,13 +246,21 @@ if (isset($_POST['add_to_cart'])) {
                            </div>
 
                            <div class="card-body d-flex flex-column">
-                              <div class="mb-1 text-muted small text-uppercase"><?php echo htmlspecialchars($fetch_products['publisher_name']); ?></div>
+                              <div class="mb-1 text-muted small text-uppercase">
+                                 <a href="view_publisher.php?id=<?php echo $fetch_products['publisher_id']; ?>" class="text-decoration-none text-muted">
+                                    <?php echo htmlspecialchars($fetch_products['publisher_name']); ?>
+                                 </a>
+                              </div>
                               <h6 class="card-title fw-bold mb-1 text-truncate">
                                  <a href="detail.php?id=<?php echo $fetch_products['id']; ?>" class="text-decoration-none text-dark">
                                     <?php echo htmlspecialchars($fetch_products['book_name']); ?>
                                  </a>
                               </h6>
-                              <p class="card-text small text-secondary mb-2">by <?php echo htmlspecialchars($fetch_products['author_name']); ?></p>
+                              <p class="card-text small text-secondary mb-2">by
+                                 <a href="view_author.php?id=<?php echo $fetch_products['author_id']; ?>" class="text-decoration-none text-secondary fw-bold">
+                                    <?php echo htmlspecialchars($fetch_products['author_name']); ?>
+                                 </a>
+                              </p>
 
                               <div class="mt-auto">
                                  <div class="d-flex justify-content-between align-items-center mb-3">
