@@ -129,7 +129,7 @@ if (isset($_POST['submit'])) {
    <div class="container d-flex align-items-center justify-content-center min-vh-100">
       <div class="login-card card p-4 fade-in" style="max-width: 400px; width: 100%;">
          <div class="text-center mb-3">
-            <img src="https://cdn-icons-png.flaticon.com/512/5087/5087579.png" alt="Login" width="64" class="mb-2">
+            <img src="https://cdn-icons-png.flaticon.com/512/5087/5087579.png" alt="Login" width="64" class="mb-2" style="filter: drop-shadow(0 2px 8px #a5b4fc);">
             <h3 class="login-title mb-1">Welcome Back!</h3>
             <div class="desc">Sign in to continue shopping.</div>
          </div>
@@ -142,10 +142,16 @@ if (isset($_POST['submit'])) {
                <input type="password" name="password" id="loginPassword" placeholder="Enter your password" required class="form-control">
                <label for="loginPassword">Password</label>
             </div>
-            <div class="form-check mb-3">
-               <input class="form-check-input" type="checkbox" name="remember" id="rememberMe">
-               <label class="form-check-label" for="rememberMe">Remember me</label>
+
+            <!-- UPDATED: Flex container for Remember Me and Forgot Password -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+               <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="remember" id="rememberMe">
+                  <label class="form-check-label" for="rememberMe">Remember me</label>
+               </div>
+               <a href="forgot_password.php" class="text-decoration-none small text-primary">Forgot Password?</a>
             </div>
+
             <div class="d-grid mb-3">
                <input type="submit" name="submit" value="Login now" class="btn btn-primary btn-lg">
             </div>
